@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { Handler, Request, Response } from "express";
-import { secretKey } from "../../config/env.js";
-import { verifyUser } from "../../service/database.js";
+import { secretKey } from "../../config/env";
+import { verifyUser } from "../../service/database";
 
 
 
@@ -10,7 +10,7 @@ import { verifyUser } from "../../service/database.js";
  * @param req 
  * @param res 
  */
-export const authController: Handler = async (req: Request, res: Response) => {
+export const authController: Handler = async (req: Request, res: Response) => { // TODO: agregar rol del usuario al payload del JWT
   const { user, password } = req.body;
 
   if (typeof user !== 'string' || typeof password !== 'string') {
