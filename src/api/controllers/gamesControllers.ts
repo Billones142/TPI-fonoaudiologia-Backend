@@ -1,6 +1,7 @@
-import { Handler, Request, Response } from "express";
-import jwt from "jsonwebtoken";
-import { gamesSecret } from "../../config/env";
+import { Handler, Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
+import { gamesSecret } from '../../config/env';
+import CryptoJS from 'crypto-js';
 
 
 const escenarios: Scene[] = [ // TODO: temporal mientras no hay base de datos
@@ -9,25 +10,25 @@ const escenarios: Scene[] = [ // TODO: temporal mientras no hay base de datos
     objects: [
       {
         name: 'Tenedor',
-        position: {},
+        verticesLocation: [],
         imageUrl: 'imagen1', // TODO cambiar
         videoUrl: 'video1',
       },
       {
         name: 'Televisor',
-        position: {},
+        verticesLocation: [],
         imageUrl: 'imagen2', // TODO cambiar
         videoUrl: 'video2',
       },
       {
         name: 'Microondas',
-        position: {},
+        verticesLocation: [],
         imageUrl: 'imagen3', // TODO cambiar
         videoUrl: 'video3',
-      }
+      },
     ],
   },
-]
+];
 
 interface Scene {
   id: string,
@@ -36,7 +37,7 @@ interface Scene {
 
 interface SceneObject {
   name: string,
-  position: object, // TODO: especificar
+  verticesLocation: [number, number][],
   imageUrl: string,
   videoUrl: string,
 }
@@ -46,8 +47,44 @@ interface SceneObjectToSelect extends SceneObject {
   selectionId: string,
 }
 
+interface SceneObjectJWTPayload {
+  isGameResult: boolean,
+  objectName: string,
+  sceneId: string,
+  variator: number,
+  generationTime: number,
+}
+
 function getShuffledIndexes(array: Array<unknown>): Array<number> {
-  return array.map((_, index) => index).sort(() => Math.random() - 0.5)
+  return array.map((_, index) => index).sort(() => Math.random() - 0.5);
+}
+
+function encriptarSelectorObjeto(objeto: SceneObject, isGameResult: boolean, escenario: Scene, tiempoDeGeneracion: number): string {
+  const payload: SceneObjectJWTPayload = {
+    isGameResult: isGameResult,
+    objectName: objeto.name,
+    sceneId: escenario.id,
+    variator: Math.random(), // payload to alter the final jwt and make it diferent
+    generationTime: tiempoDeGeneracion,
+  };
+
+  // Encriptar el payload
+
+  const encryptedPayload = CryptoJS.AES.encrypt(JSON.stringify(payload), gamesSecret).toString();
+
+  const token = jwt.sign({ data: encryptedPayload }, gamesSecret, { expiresIn: '1h' });
+
+  return token;
+}
+
+function desencriptarSelectorObjeto(encryptedJWT: string): SceneObjectJWTPayload {
+  const decoded = jwt.verify(encryptedJWT, gamesSecret) as { data: string };
+
+  const decryptedBytes = CryptoJS.AES.decrypt(decoded.data, gamesSecret);
+
+  const decryptedPayload = JSON.parse(decryptedBytes.toString(CryptoJS.enc.Utf8)) as SceneObjectJWTPayload;
+
+  return decryptedPayload;
 }
 
 /**
@@ -56,11 +93,14 @@ function getShuffledIndexes(array: Array<unknown>): Array<number> {
  * @param jokerObjectsAmmount ammout of objects that will be added with co
  * @returns 
  */
-async function generarJuegosAleatorios(sceneId: string, jokerObjectsAmmount: number): Promise<Array<SceneObjectToSelect[]>> {
+async function generarJuegosAleatorios(sceneId: string, jokerObjectsAmmount: number): Promise<Array<SceneObjectToSelect[]>> { // Encriptar JWT
   const escenario = escenarios.find(escenario => escenario.id === sceneId);
+
   if (!escenario) {
     throw new Error('No scene with that id found');
   }
+
+  const tiempoDeGeneracion = Date.now();
 
   const shuffledGames: Array<SceneObjectToSelect[]> = [];
 
@@ -73,24 +113,12 @@ async function generarJuegosAleatorios(sceneId: string, jokerObjectsAmmount: num
 
     const principalObject = {
       ...escenario.objects[correctObjectIndex],
-      selectionId: jwt.sign(
-        {
-          isGameResult: true,
-          objectName: escenario.objects[correctObjectIndex].name,
-          sceneId: escenario.id,
-          variator: Math.random(), // payload to alter the final jwt and make it diferent
-        }, gamesSecret)
+      selectionId: encriptarSelectorObjeto(escenario.objects[correctObjectIndex], true, escenario, tiempoDeGeneracion),
     };
 
     const jokerObjects = jokerObjectsIndexes.map(jokerIndex => ({
       ...escenario.objects[jokerIndex],
-      selectionId: jwt.sign(
-        {
-          isGameResult: false,
-          objectName: escenario.objects[jokerIndex].name,
-          sceneId: escenario.id,
-          variator: Math.random(), // payload to alter the final jwt and make it diferent
-        }, gamesSecret),
+      selectionId: encriptarSelectorObjeto(escenario.objects[jokerIndex], false, escenario, tiempoDeGeneracion),
     }));
 
     const objectsForGame = [principalObject, ...jokerObjects];
@@ -125,6 +153,41 @@ export const getGames: Handler = async (req: Request, res: Response) => {
   }
 };
 
-export const checkGameResult: Handler = async (req: Request, res: Response) => { // TODO
+export const checkGameResult: Handler = async (req: Request, res: Response): Promise<void> => { // TODO: agregar conexion a la base de datos
   const { selectionId } = req.params;
+
+  if (typeof selectionId !== 'string') {
+    throw new Error('Selection id is not a string');
+  }
+
+  try {
+    const decryptedPayload = desencriptarSelectorObjeto(selectionId);
+    if (decryptedPayload.isGameResult) {
+      res.json({
+        isCorrect: true,
+      });
+    } else {
+      res.json({
+        isCorrect: false,
+      });
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      if (error.name === 'JsonWebTokenError' && error.message === 'invalid signature') {
+        res.status(406) // code 406: not acceptable
+          .json({
+            message: 'The token was not valid',
+          });
+      } else {
+        res.status(406)
+          .json({
+            error: error.message,
+          });
+      }
+    } else {
+      res.status(500).json({
+        error: error,
+      });
+    }
+  }
 };

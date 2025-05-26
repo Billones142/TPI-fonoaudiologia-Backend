@@ -1,7 +1,7 @@
-import express, { Request, Response, NextFunction, Handler } from 'express';
+import express from 'express';
 import cors from 'cors';
-import { PORT, secretKey } from './config/env';
-import apiRoutes from "./api/index";
+import { PORT } from './config/env';
+import apiRoutes from './api/index';
 
 const app = express();
 app.use(
