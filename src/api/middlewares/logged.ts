@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction, Handler } from 'express';
 import jwt from "jsonwebtoken";
 import cookieParser from 'cookie-parser';
-import { secretKey } from "../../config/env";
+import { secretKey } from "../../config/env.js";
 
 const router = express.Router();
 router.use(cookieParser());
