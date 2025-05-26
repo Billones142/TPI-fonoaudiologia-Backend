@@ -1,5 +1,5 @@
 import express from 'express';
-import { authController } from '../controllers/loginController';
+import { authController } from '../controllers/autenticationController.js';
 import bodyParser from 'body-parser';
 
 const router = express.Router();
