@@ -2,7 +2,6 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "tpi-fonoaudiologia-backend",
       "dependencies": {
         "@prisma/client": "^6.8.2",
         "@types/cors": "^2.8.18",
@@ -248,10 +247,10 @@
     ],
 
     "@types/bun": [
-      "@types/bun@1.2.11",
+      "@types/bun@1.2.14",
       "",
-      { "dependencies": { "bun-types": "1.2.11" } },
-      "sha512-ZLbbI91EmmGwlWTRWuV6J19IUiUC5YQ3TCEuSHI3usIP75kuoA8/0PVF+LTrbEnVc8JIhpElWOxv1ocI1fJBbw=="
+      { "dependencies": { "bun-types": "1.2.14" } },
+      "sha512-VsFZKs8oKHzI7zwvECiAJ5oSorWndIWEVhfbYqZd4HI/45kzW7PN2Rr5biAzvGvRuNmYLSANY+H59ubHq8xw7Q=="
     ],
 
     "@types/connect": [
@@ -290,7 +289,7 @@
     ],
 
     "@types/express": [
-      "@types/express@5.0.1",
+      "@types/express@5.0.2",
       "",
       {
         "dependencies": {
@@ -299,7 +298,7 @@
           "@types/serve-static": "*"
         }
       },
-      "sha512-UZUw8vjpWFXuDnjFTh7/5c2TWDlQqeXHi6hcN7F2XSVT5P+WmUnnbFS3KA6Jnc6IsEqI2qCVu2bK0R0J4A8ZQQ=="
+      "sha512-BtjL3ZwbCQriyb0DGw+Rt12qAXPiBTPs815lsUvtt1Grk0vLRMZNMUZ741d5rjk+UQOxfDiBZ3dxpX00vSkK3g=="
     ],
 
     "@types/express-serve-static-core": [
@@ -352,17 +351,17 @@
     ],
 
     "@types/node": [
-      "@types/node@22.15.3",
+      "@types/node@22.15.23",
       "",
       { "dependencies": { "undici-types": "~6.21.0" } },
-      "sha512-lX7HFZeHf4QG/J7tBZqrCAXwz9J5RD56Y6MpP0eJkka8p+K0RY/yBTW7CYFJ4VGCclxqOLKmiGP5juQc6MKgcw=="
+      "sha512-7Ec1zaFPF4RJ0eXu1YT/xgiebqwqoJz8rYPDi/O2BcZ++Wpt0Kq9cl0eg6NN6bYbPnR67ZLo7St5Q3UK0SnARw=="
     ],
 
     "@types/qs": [
-      "@types/qs@6.9.18",
+      "@types/qs@6.14.0",
       "",
       {},
-      "sha512-kK7dgTYDyGqS+e2Q4aK9X3D7q234CIZ1Bv0q/7Z5IwRDoADNU81xXJK/YVyLbLTZCoIwUoDoffFeF+p/eIklAA=="
+      "sha512-eOunJqu0K1923aExK6y8p6fsihYEn/BYuQ4g0CxAAgFc4b/ZLN4CrsRZ55srTdqoiLzU2B2evC+apEIxprEzkQ=="
     ],
 
     "@types/range-parser": [
@@ -393,38 +392,38 @@
     ],
 
     "@typescript-eslint/eslint-plugin": [
-      "@typescript-eslint/eslint-plugin@8.32.1",
+      "@typescript-eslint/eslint-plugin@8.33.0",
       "",
       {
         "dependencies": {
           "@eslint-community/regexpp": "^4.10.0",
-          "@typescript-eslint/scope-manager": "8.32.1",
-          "@typescript-eslint/type-utils": "8.32.1",
-          "@typescript-eslint/utils": "8.32.1",
-          "@typescript-eslint/visitor-keys": "8.32.1",
+          "@typescript-eslint/scope-manager": "8.33.0",
+          "@typescript-eslint/type-utils": "8.33.0",
+          "@typescript-eslint/utils": "8.33.0",
+          "@typescript-eslint/visitor-keys": "8.33.0",
           "graphemer": "^1.4.0",
           "ignore": "^7.0.0",
           "natural-compare": "^1.4.0",
           "ts-api-utils": "^2.1.0"
         },
         "peerDependencies": {
-          "@typescript-eslint/parser": "^8.0.0 || ^8.0.0-alpha.0",
+          "@typescript-eslint/parser": "^8.33.0",
           "eslint": "^8.57.0 || ^9.0.0",
           "typescript": ">=4.8.4 <5.9.0"
         }
       },
-      "sha512-6u6Plg9nP/J1GRpe/vcjjabo6Uc5YQPAMxsgQyGC/I0RuukiG1wIe3+Vtg3IrSCVJDmqK3j8adrtzXSENRtFgg=="
+      "sha512-CACyQuqSHt7ma3Ns601xykeBK/rDeZa3w6IS6UtMQbixO5DWy+8TilKkviGDH6jtWCo8FGRKEK5cLLkPvEammQ=="
     ],
 
     "@typescript-eslint/parser": [
-      "@typescript-eslint/parser@8.32.1",
+      "@typescript-eslint/parser@8.33.0",
       "",
       {
         "dependencies": {
-          "@typescript-eslint/scope-manager": "8.32.1",
-          "@typescript-eslint/types": "8.32.1",
-          "@typescript-eslint/typescript-estree": "8.32.1",
-          "@typescript-eslint/visitor-keys": "8.32.1",
+          "@typescript-eslint/scope-manager": "8.33.0",
+          "@typescript-eslint/types": "8.33.0",
+          "@typescript-eslint/typescript-estree": "8.33.0",
+          "@typescript-eslint/visitor-keys": "8.33.0",
           "debug": "^4.3.4"
         },
         "peerDependencies": {
@@ -432,28 +431,48 @@
           "typescript": ">=4.8.4 <5.9.0"
         }
       },
-      "sha512-LKMrmwCPoLhM45Z00O1ulb6jwyVr2kr3XJp+G+tSEZcbauNnScewcQwtJqXDhXeYPDEjZ8C1SjXm015CirEmGg=="
+      "sha512-JaehZvf6m0yqYp34+RVnihBAChkqeH+tqqhS0GuX1qgPpwLvmTPheKEs6OeCK6hVJgXZHJ2vbjnC9j119auStQ=="
+    ],
+
+    "@typescript-eslint/project-service": [
+      "@typescript-eslint/project-service@8.33.0",
+      "",
+      {
+        "dependencies": {
+          "@typescript-eslint/tsconfig-utils": "^8.33.0",
+          "@typescript-eslint/types": "^8.33.0",
+          "debug": "^4.3.4"
+        }
+      },
+      "sha512-d1hz0u9l6N+u/gcrk6s6gYdl7/+pp8yHheRTqP6X5hVDKALEaTn8WfGiit7G511yueBEL3OpOEpD+3/MBdoN+A=="
     ],
 
     "@typescript-eslint/scope-manager": [
-      "@typescript-eslint/scope-manager@8.32.1",
+      "@typescript-eslint/scope-manager@8.33.0",
       "",
       {
         "dependencies": {
-          "@typescript-eslint/types": "8.32.1",
-          "@typescript-eslint/visitor-keys": "8.32.1"
+          "@typescript-eslint/types": "8.33.0",
+          "@typescript-eslint/visitor-keys": "8.33.0"
         }
       },
-      "sha512-7IsIaIDeZn7kffk7qXC3o6Z4UblZJKV3UBpkvRNpr5NSyLji7tvTcvmnMNYuYLyh26mN8W723xpo3i4MlD33vA=="
+      "sha512-LMi/oqrzpqxyO72ltP+dBSP6V0xiUb4saY7WLtxSfiNEBI8m321LLVFU9/QDJxjDQG9/tjSqKz/E3380TEqSTw=="
+    ],
+
+    "@typescript-eslint/tsconfig-utils": [
+      "@typescript-eslint/tsconfig-utils@8.33.0",
+      "",
+      { "peerDependencies": { "typescript": ">=4.8.4 <5.9.0" } },
+      "sha512-sTkETlbqhEoiFmGr1gsdq5HyVbSOF0145SYDJ/EQmXHtKViCaGvnyLqWFFHtEXoS0J1yU8Wyou2UGmgW88fEug=="
     ],
 
     "@typescript-eslint/type-utils": [
-      "@typescript-eslint/type-utils@8.32.1",
+      "@typescript-eslint/type-utils@8.33.0",
       "",
       {
         "dependencies": {
-          "@typescript-eslint/typescript-estree": "8.32.1",
-          "@typescript-eslint/utils": "8.32.1",
+          "@typescript-eslint/typescript-estree": "8.33.0",
+          "@typescript-eslint/utils": "8.33.0",
           "debug": "^4.3.4",
           "ts-api-utils": "^2.1.0"
         },
@@ -462,23 +481,25 @@
           "typescript": ">=4.8.4 <5.9.0"
         }
       },
-      "sha512-mv9YpQGA8iIsl5KyUPi+FGLm7+bA4fgXaeRcFKRDRwDMu4iwrSHeDPipwueNXhdIIZltwCJv+NkxftECbIZWfA=="
+      "sha512-lScnHNCBqL1QayuSrWeqAL5GmqNdVUQAAMTaCwdYEdWfIrSrOGzyLGRCHXcCixa5NK6i5l0AfSO2oBSjCjf4XQ=="
     ],
 
     "@typescript-eslint/types": [
-      "@typescript-eslint/types@8.32.1",
+      "@typescript-eslint/types@8.33.0",
       "",
       {},
-      "sha512-YmybwXUJcgGqgAp6bEsgpPXEg6dcCyPyCSr0CAAueacR/CCBi25G3V8gGQ2kRzQRBNol7VQknxMs9HvVa9Rvfg=="
+      "sha512-DKuXOKpM5IDT1FA2g9x9x1Ug81YuKrzf4mYX8FAVSNu5Wo/LELHWQyM1pQaDkI42bX15PWl0vNPt1uGiIFUOpg=="
     ],
 
     "@typescript-eslint/typescript-estree": [
-      "@typescript-eslint/typescript-estree@8.32.1",
+      "@typescript-eslint/typescript-estree@8.33.0",
       "",
       {
         "dependencies": {
-          "@typescript-eslint/types": "8.32.1",
-          "@typescript-eslint/visitor-keys": "8.32.1",
+          "@typescript-eslint/project-service": "8.33.0",
+          "@typescript-eslint/tsconfig-utils": "8.33.0",
+          "@typescript-eslint/types": "8.33.0",
+          "@typescript-eslint/visitor-keys": "8.33.0",
           "debug": "^4.3.4",
           "fast-glob": "^3.3.2",
           "is-glob": "^4.0.3",
@@ -488,37 +509,37 @@
         },
         "peerDependencies": { "typescript": ">=4.8.4 <5.9.0" }
       },
-      "sha512-Y3AP9EIfYwBb4kWGb+simvPaqQoT5oJuzzj9m0i6FCY6SPvlomY2Ei4UEMm7+FXtlNJbor80ximyslzaQF6xhg=="
+      "sha512-vegY4FQoB6jL97Tu/lWRsAiUUp8qJTqzAmENH2k59SJhw0Th1oszb9Idq/FyyONLuNqT1OADJPXfyUNOR8SzAQ=="
     ],
 
     "@typescript-eslint/utils": [
-      "@typescript-eslint/utils@8.32.1",
+      "@typescript-eslint/utils@8.33.0",
       "",
       {
         "dependencies": {
           "@eslint-community/eslint-utils": "^4.7.0",
-          "@typescript-eslint/scope-manager": "8.32.1",
-          "@typescript-eslint/types": "8.32.1",
-          "@typescript-eslint/typescript-estree": "8.32.1"
+          "@typescript-eslint/scope-manager": "8.33.0",
+          "@typescript-eslint/types": "8.33.0",
+          "@typescript-eslint/typescript-estree": "8.33.0"
         },
         "peerDependencies": {
           "eslint": "^8.57.0 || ^9.0.0",
           "typescript": ">=4.8.4 <5.9.0"
         }
       },
-      "sha512-DsSFNIgLSrc89gpq1LJB7Hm1YpuhK086DRDJSNrewcGvYloWW1vZLHBTIvarKZDcAORIy/uWNx8Gad+4oMpkSA=="
+      "sha512-lPFuQaLA9aSNa7D5u2EpRiqdAUhzShwGg/nhpBlc4GR6kcTABttCuyjFs8BcEZ8VWrjCBof/bePhP3Q3fS+Yrw=="
     ],
 
     "@typescript-eslint/visitor-keys": [
-      "@typescript-eslint/visitor-keys@8.32.1",
+      "@typescript-eslint/visitor-keys@8.33.0",
       "",
       {
         "dependencies": {
-          "@typescript-eslint/types": "8.32.1",
+          "@typescript-eslint/types": "8.33.0",
           "eslint-visitor-keys": "^4.2.0"
         }
       },
-      "sha512-ar0tjQfObzhSaW3C3QNmTc5ofj0hDoNQ5XWrCy6zDyabdr0TWhCkClp+rywGNj/odAFBVzzJrK4tEq5M4Hmu4w=="
+      "sha512-7RW7CMYoskiz5OOGAWjJFxgb7c5UNjTG292gYhWeOAcFmYCtVCSqjqSBj5zMhxbXo2JOW95YYrUWJfU0zrpaGQ=="
     ],
 
     "accepts": [
@@ -618,10 +639,10 @@
     ],
 
     "bun-types": [
-      "bun-types@1.2.11",
+      "bun-types@1.2.14",
       "",
       { "dependencies": { "@types/node": "*" } },
-      "sha512-dbkp5Lo8HDrXkLrONm6bk+yiiYQSntvFUzQp0v3pzTAsXk6FtgVMjdQ+lzFNVAmQFUkPQZ3WMZqH5tTo+Dp/IA=="
+      "sha512-Kuh4Ub28ucMRWeiUUWMHsT9Wcbr4H3kLIO72RZZElSDxSu7vpetRvxIUDUaW6QtaIeixIpm7OXtNnZPf82EzwA=="
     ],
 
     "bytes": [
@@ -750,10 +771,10 @@
     ],
 
     "debug": [
-      "debug@4.4.0",
+      "debug@4.4.1",
       "",
       { "dependencies": { "ms": "^2.1.3" } },
-      "sha512-6WTZ/IxCY/T6BALoZHaE4ctp9xm+Z5kY/pzYaCHRFeyVhojxlrm+46y68HA6hr0TcwEssoxNiDEUJQjfPZ/RYA=="
+      "sha512-KcKCqiftBJcZr++7ykoDIEwSa3XWowTfNPo92BYxjXiyYEVrUQh2aLyhxBCwww+heortUFxEJYcRzosstTEBYQ=="
     ],
 
     "deep-is": [
@@ -1880,35 +1901,6 @@
       "sha512-o5sSPKEkg/DIQNmH43V0/uerLrpzVedkUh8tGNvaeXpfpuwjKenlSox/2O/BTlZUtEe+JG7s5YhEz608PlAHRA=="
     ],
 
-    "tpi-fonoaudiologia-backend": [
-      "tpi-fonoaudiologia-backend@file:",
-      {
-        "dependencies": {
-          "@types/cors": "^2.8.18",
-          "@types/crypto-js": "^4.2.2",
-          "@types/jsonwebtoken": "^9.0.9",
-          "@typescript-eslint/eslint-plugin": "^8.32.1",
-          "@typescript-eslint/parser": "^8.32.1",
-          "cookie-parser": "^1.4.7",
-          "cors": "^2.8.5",
-          "crypto-js": "^4.2.0",
-          "express": "^5.1.0",
-          "jsonwebtoken": "^9.0.2",
-          "tpi-fonoaudiologia-backend": "file:"
-        },
-        "devDependencies": {
-          "@eslint/eslintrc": "^3.3.1",
-          "@eslint/js": "^9.27.0",
-          "@types/bun": "latest",
-          "@types/cookie-parser": "^1.4.8",
-          "@types/express": "^5.0.1",
-          "eslint": "^9.27.0",
-          "globals": "^16.2.0"
-        },
-        "peerDependencies": { "typescript": "^5" }
-      }
-    ],
-
     "ts-api-utils": [
       "ts-api-utils@2.1.0",
       "",
@@ -2051,30 +2043,11 @@
       "sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow=="
     ],
 
-    "tpi-fonoaudiologia-backend/@types/bun": [
-      "@types/bun@1.2.14",
-      "",
-      { "dependencies": { "bun-types": "1.2.14" } },
-      "sha512-VsFZKs8oKHzI7zwvECiAJ5oSorWndIWEVhfbYqZd4HI/45kzW7PN2Rr5biAzvGvRuNmYLSANY+H59ubHq8xw7Q=="
-    ],
-
-    "tpi-fonoaudiologia-backend/tpi-fonoaudiologia-backend": [
-      "tpi-fonoaudiologia-backend@file:.",
-      {}
-    ],
-
     "@typescript-eslint/typescript-estree/minimatch/brace-expansion": [
       "brace-expansion@2.0.1",
       "",
       { "dependencies": { "balanced-match": "^1.0.0" } },
       "sha512-XnAIvQ8eM+kC6aULx6wuQiwVsnzsi9d3WxzV3FpWTGA19F621kwdbsAcFKXgKUHZWsy+mY6iL1sHTxWEFCytDA=="
-    ],
-
-    "tpi-fonoaudiologia-backend/@types/bun/bun-types": [
-      "bun-types@1.2.14",
-      "",
-      { "dependencies": { "@types/node": "*" } },
-      "sha512-Kuh4Ub28ucMRWeiUUWMHsT9Wcbr4H3kLIO72RZZElSDxSu7vpetRvxIUDUaW6QtaIeixIpm7OXtNnZPf82EzwA=="
     ]
   }
 }
