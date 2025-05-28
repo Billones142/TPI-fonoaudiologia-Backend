@@ -6,25 +6,38 @@ import CryptoJS from 'crypto-js';
 
 const escenarios: Scene[] = [ // TODO: temporal mientras no hay base de datos
   {
-    id: 'abcd1',
+    id: '123456',
+    name: 'cocina',
     objects: [
       {
         name: 'Tenedor',
         verticesLocation: [],
-        imageUrl: 'imagen1', // TODO cambiar
-        videoUrl: 'video1',
+        imageUrl: 'https://res.cloudinary.com/dhsx2g5ez/image/upload/tenedor_i24tpf.webp',
+        videoUrl: 'https://res.cloudinary.com/dhignxely/video/upload/v1746375570/fonoej_mzxth6.mp4',
       },
       {
-        name: 'Televisor',
+        name: 'Cuchillo',
         verticesLocation: [],
-        imageUrl: 'imagen2', // TODO cambiar
-        videoUrl: 'video2',
+        imageUrl: 'https://res.cloudinary.com/dhsx2g5ez/image/upload/cuchillo_ovirp5.webp',
+        videoUrl: 'https://res.cloudinary.com/dhignxely/video/upload/v1746375570/fonoej_mzxth6.mp4',
+      },
+      {
+        name: 'Cuchara',
+        verticesLocation: [],
+        imageUrl: 'https://res.cloudinary.com/dhsx2g5ez/image/upload/cuchara_usbvwr.webp',
+        videoUrl: 'https://res.cloudinary.com/dhsx2g5ez/video/upload/Cuchara_jahdxg.mp4',
       },
       {
         name: 'Microondas',
         verticesLocation: [],
-        imageUrl: 'imagen3', // TODO cambiar
-        videoUrl: 'video3',
+        imageUrl: 'https://res.cloudinary.com/dhsx2g5ez/image/upload/microondas_plflqi.webp',
+        videoUrl: 'https://res.cloudinary.com/dhsx2g5ez/video/upload/microondas_yurgvz.mp4',
+      },
+      {
+        name: 'Lavarropas',
+        verticesLocation: [],
+        imageUrl: 'https://res.cloudinary.com/dhsx2g5ez/image/upload/image_xrozbw.webp',
+        videoUrl: 'https://res.cloudinary.com/dhsx2g5ez/video/upload/lavadora_aanpq9.mp4',
       },
     ],
   },
@@ -32,6 +45,7 @@ const escenarios: Scene[] = [ // TODO: temporal mientras no hay base de datos
 
 interface Scene {
   id: string,
+  name: string,
   objects: SceneObject[],
 }
 
