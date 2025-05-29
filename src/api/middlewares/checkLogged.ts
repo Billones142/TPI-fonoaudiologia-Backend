@@ -1,24 +1,25 @@
 import express, { Request, Response, NextFunction, Handler } from 'express';
-import jwt from "jsonwebtoken";
+import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
-import { secretKey } from "../../config/env";
+import { secretKey } from '../../config/env';
 
 const router = express.Router();
 router.use(cookieParser());
 
-export interface AuthenticatedRequest extends Request {
-  user?: {
-    username: string,
-  },
-}
+//export interface AuthenticatedRequest extends Request {
+//  user?: {
+//    username: string,
+//  },
+//}
 
 /**
- * requires to have the bodyparser with urlencoded
+ * requires to have the bodyparser with urlencoded to work
+ * @description checks that the user is logged in and adds the data from this user to the request
  * @param req 
  * @param res 
  * @param next 
  */
-export const userLoggedCheckMiddleware: Handler = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+export const userLoggedCheckMiddleware: Handler = async (req: Request, res: Response, next: NextFunction): Promise<void> => { // TODO: agregar logica de base de datos
   const { sessionid } = req.cookies;
 
   if (typeof sessionid !== 'string') {
