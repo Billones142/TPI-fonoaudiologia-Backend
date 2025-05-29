@@ -19,7 +19,7 @@ const escenarios: Scene[] = [ // TODO: temporal mientras no hay base de datos
         name: 'Cuchillo',
         verticesLocation: [],
         imageUrl: 'https://res.cloudinary.com/dhsx2g5ez/image/upload/cuchillo_ovirp5.webp',
-        videoUrl: 'https://res.cloudinary.com/dhignxely/video/upload/v1746375570/fonoej_mzxth6.mp4',
+        videoUrl: 'https://res.cloudinary.com/dhsx2g5ez/video/upload/Cuchillo.mp4',
       },
       {
         name: 'Cuchara',
