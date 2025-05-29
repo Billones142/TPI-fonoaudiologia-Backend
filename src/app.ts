@@ -1,6 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import { PORT } from './config/env';
 import apiRoutes from './api/index';
 
 const app = express();
@@ -13,7 +12,4 @@ app.use(
 
 app.use('/api/v1', apiRoutes);
 
-
-app.listen(PORT, () => {
-  console.log(`started on port ${PORT}`);
-});
+export default app;

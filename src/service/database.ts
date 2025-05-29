@@ -1,6 +1,6 @@
 
 const allowedUsers: { [key: string]: string } = {
-  'stefano': '1234',
+  'prueba1': '123456',
 };
 
 // TODO: add database

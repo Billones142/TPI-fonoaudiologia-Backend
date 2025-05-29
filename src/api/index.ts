@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import gameRoutes from './routes/gameRoutes';
-import loginRoutes from './routes/loginRoutes';
+import userDataRoutes from './routes/userDataRoutes';
 
 const router = Router();
 
-router.use(loginRoutes);
+router.use('/user', userDataRoutes);
 
 // cookie protected routes
-router.use('/games'/** middleware */, gameRoutes);
+router.use('/games', gameRoutes);
 
 export default router;
