@@ -1,0 +1,198 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  MEDICO
+  PACIENTE
+}
+
+model Usuario {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  rol       Role
+
+  perfiles  Perfil[]
+
+  medicoId  String? 
+  medico    Usuario?  @relation("MedicoPacientes", fields: [medicoId], references: [id])
+  
+  pacientes Usuario[] @relation("MedicoPacientes")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([rol])
+  @@index([medicoId])
+
+}
+
+model Perfil {
+  id        String   @id @default(cuid())
+  nombre   String
+  avatarUrl String
+
+
+  progresosEscenarios ProgresoEscenario[]
+
+  notificaciones Notificacion[]
+
+  sesionesJuego SesionJuego[]
+
+  usuarioId String
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([usuarioId])
+}
+
+model Notificacion {
+  id        String   @id @default(cuid())
+  titulo    String
+  mensaje   String
+  leido     Boolean  @default(false)
+
+  perfilId  String
+  perfil    Perfil   @relation(fields: [perfilId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([perfilId])
+  @@index([leido])
+  @@index([createdAt])  
+}
+
+model ProgresoEscenario {
+  id        String   @id @default(cuid())
+  completado Boolean @default(false)
+  objetosTotales Int
+  objetosReconocidos Int
+  porcentajeReconocido Float
+
+  escenarioId String
+  escenario   Escenario @relation(fields: [escenarioId], references: [id])
+
+  perfilId  String
+  perfil    Perfil   @relation(fields: [perfilId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([perfilId])
+  @@index([escenarioId])
+
+}
+
+model Escenario {
+  id        String   @id @default(cuid())
+  nombre    String
+  descripcion String?
+  imagenUrl String
+
+  progresosEscenarios ProgresoEscenario[]
+
+  objetos ObjetoEscenario[]
+
+  sesiones SesionJuego[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ObjetoEscenario {
+  id        String   @id @default(cuid())
+  nombre    String
+  coordenadas String
+  imagenUrl String
+  videoSenaUrl String
+
+  opcionesJuego JuegoOpcion[]
+
+  juegosCorrectos Juego[] @relation("OpcionCorrecta")
+
+  juegosSeleccionados Juego[] @relation("ObjetoSeleccionado")
+
+  escenarioId String
+  escenario   Escenario @relation(fields: [escenarioId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([escenarioId])
+}
+
+model Juego {
+  id        String   @id @default(cuid())
+
+  opciones JuegoOpcion[]
+
+  objetoCorrectoId String
+  objetoCorrecto   ObjetoEscenario @relation("OpcionCorrecta",fields: [objetoCorrectoId], references: [id])
+
+  objetoSeleccionadoId String
+  objetoSeleccionado   ObjetoEscenario @relation("ObjetoSeleccionado",fields: [objetoSeleccionadoId], references: [id])
+
+  sesionJuegoId String
+  sesionJuego   SesionJuego @relation(fields: [sesionJuegoId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sesionJuegoId])
+  @@index([objetoCorrectoId])
+  @@index([objetoSeleccionadoId])
+
+}
+
+model JuegoOpcion {
+  id        String   @id @default(cuid())
+
+  juegoId   String
+  juego     Juego    @relation(fields: [juegoId], references: [id])
+
+  objetoEscenarioId String
+  objetoEscenario   ObjetoEscenario @relation(fields: [objetoEscenarioId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SesionJuego {
+  id        String   @id @default(cuid())
+  inicio     DateTime 
+  fin        DateTime
+  juegosTotales Int
+  aciertos Int
+  errores Int
+
+  perfilId  String
+  perfil    Perfil   @relation(fields: [perfilId], references: [id])
+
+  escenarioId String
+  escenario   Escenario @relation(fields: [escenarioId], references: [id])
+
+  juegos Juego[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([perfilId])
+  @@index([escenarioId])
+  @@index([createdAt])
+}
