@@ -2,6 +2,8 @@ import { Handler, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { gamesSecret } from '../../config/env';
 import CryptoJS from 'crypto-js';
+import { Game, Scene, SceneObject, SceneObjectJWTPayload, SceneObjectToSelect } from '../../types/models/games';
+import { CheckGameResult, GetGamesResponse } from '../../types/api/APIResponses';
 
 
 export const escenarios: Scene[] = [ // TODO: temporal mientras no hay base de datos
@@ -43,31 +45,6 @@ export const escenarios: Scene[] = [ // TODO: temporal mientras no hay base de d
   },
 ];
 
-interface Scene {
-  id: string,
-  name: string,
-  objects: SceneObject[],
-}
-
-interface SceneObject {
-  name: string,
-  verticesLocation: [number, number][],
-  imageUrl: string,
-  videoUrl: string,
-}
-
-export interface SceneObjectToSelect extends SceneObject {
-  /** JWT that will contain in the payload if it is correct or not */
-  selectionId: string,
-}
-
-interface SceneObjectJWTPayload {
-  isGameResult: boolean,
-  objectName: string,
-  sceneId: string,
-  variator: number,
-  generationTime: number,
-}
 
 function getShuffledIndexes(array: Array<unknown>): Array<number> {
   return array.map((_, index) => index).sort(() => Math.random() - 0.5);
@@ -99,11 +76,6 @@ function desencriptarSelectorObjeto(encryptedJWT: string): SceneObjectJWTPayload
   const decryptedPayload = JSON.parse(decryptedBytes.toString(CryptoJS.enc.Utf8)) as SceneObjectJWTPayload;
 
   return decryptedPayload;
-}
-
-export interface Game {
-  videoUrl: string,
-  objects: SceneObjectToSelect[],
 }
 
 /**
@@ -159,20 +131,32 @@ async function generarJuegosAleatorios(sceneId: string, jokerObjectsAmmount: num
 
 export const getGames: Handler = async (req: Request, res: Response) => {
   const { sceneId } = req.params;
+  let apiResponse: GetGamesResponse;
 
   try {
     const juegos = await generarJuegosAleatorios(sceneId, 2);
 
-    res.json({
-      gamesData: juegos,
-    });
+    apiResponse = {
+      status: 'ok',
+      games_data: juegos,
+    };
   } catch (error) {
     if (error instanceof Error) {
-      res.status(404).json({ message: error.message });
+      apiResponse = {
+        status: 'error',
+        error: ['game not found', error.message],
+      };
+      res.status(404);
     } else {
-      res.status(500).json({ message: error });
+      apiResponse = {
+        status: 'error',
+        error: [String(error)],
+      };
+      res.status(500);
     }
   }
+
+  res.json(apiResponse);
 };
 
 export const checkGameResult: Handler = async (req: Request, res: Response): Promise<void> => { // TODO: agregar conexion a la base de datos
@@ -182,34 +166,42 @@ export const checkGameResult: Handler = async (req: Request, res: Response): Pro
     throw new Error('Selection id is not a string');
   }
 
+  let apiResponse: CheckGameResult;
+
+  // TODO: agregar uso de interfaz para la respuesta
   try {
     const decryptedPayload = desencriptarSelectorObjeto(selectionId);
-    if (decryptedPayload.isGameResult) {
-      res.json({
-        isCorrect: true,
-      });
-    } else {
-      res.json({
-        isCorrect: false,
-      });
-    }
+
+    apiResponse = {
+      status: 'ok',
+      scene_id: decryptedPayload.sceneId,
+      is_correct: decryptedPayload.isGameResult,
+      object_name: decryptedPayload.objectName,
+    };
+    res.json(apiResponse);
   } catch (error) {
     if (error instanceof Error) {
       if (error.name === 'JsonWebTokenError' && error.message === 'invalid signature') {
-        res.status(406) // code 406: not acceptable
-          .json({
-            message: 'The token was not valid',
-          });
+        apiResponse = {
+          status: 'error',
+          error: ['The token was not valid'],
+        };
+        res.status(406); // code 406: not acceptable
       } else {
-        res.status(406)
-          .json({
-            error: error.message,
-          });
+        apiResponse = {
+          status: 'error',
+          error: [error.message],
+        };
+        res.status(406);
       }
     } else {
-      res.status(500).json({
-        error: error,
-      });
+      apiResponse = {
+        status: 'error',
+        error: [String(error)],
+      };
+      res.status(500);
     }
   }
+
+  res.json(apiResponse);
 };
