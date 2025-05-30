@@ -4,7 +4,7 @@ import { gamesSecret } from '../../config/env';
 import CryptoJS from 'crypto-js';
 
 
-const escenarios: Scene[] = [ // TODO: temporal mientras no hay base de datos
+export const escenarios: Scene[] = [ // TODO: temporal mientras no hay base de datos
   {
     id: '123456',
     name: 'cocina',
@@ -56,7 +56,7 @@ interface SceneObject {
   videoUrl: string,
 }
 
-interface SceneObjectToSelect extends SceneObject {
+export interface SceneObjectToSelect extends SceneObject {
   /** JWT that will contain in the payload if it is correct or not */
   selectionId: string,
 }
@@ -101,13 +101,18 @@ function desencriptarSelectorObjeto(encryptedJWT: string): SceneObjectJWTPayload
   return decryptedPayload;
 }
 
+export interface Game {
+  videoUrl: string,
+  objects: SceneObjectToSelect[],
+}
+
 /**
  * 
  * @param sceneId 
  * @param jokerObjectsAmmount ammout of objects that will be added with co
  * @returns 
  */
-async function generarJuegosAleatorios(sceneId: string, jokerObjectsAmmount: number): Promise<Array<SceneObjectToSelect[]>> { // Encriptar JWT
+async function generarJuegosAleatorios(sceneId: string, jokerObjectsAmmount: number): Promise<Array<Game>> { // Encriptar JWT
   const escenario = escenarios.find(escenario => escenario.id === sceneId);
 
   if (!escenario) {
@@ -116,7 +121,7 @@ async function generarJuegosAleatorios(sceneId: string, jokerObjectsAmmount: num
 
   const tiempoDeGeneracion = Date.now();
 
-  const shuffledGames: Array<SceneObjectToSelect[]> = [];
+  const shuffledGames: Array<Game> = [];
 
   // For each object in the scene, create a game where it's the correct one
   escenario.objects.forEach((_, correctObjectIndex) => {
@@ -143,7 +148,10 @@ async function generarJuegosAleatorios(sceneId: string, jokerObjectsAmmount: num
       shuffledObjectsForGame.push(objectsForGame[objectIndex]);
     });
 
-    shuffledGames.push(shuffledObjectsForGame);
+    shuffledGames.push({
+      videoUrl: principalObject.videoUrl,
+      objects: shuffledObjectsForGame,
+    });
   });
 
   return shuffledGames;
