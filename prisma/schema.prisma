@@ -83,7 +83,6 @@ model ProgresoEscenario {
   completado Boolean @default(false)
   objetosTotales Int
   objetosReconocidos Int
-  porcentajeReconocido Float
 
   escenarioId String
   escenario   Escenario @relation(fields: [escenarioId], references: [id])
