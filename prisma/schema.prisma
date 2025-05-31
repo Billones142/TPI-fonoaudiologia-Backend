@@ -144,8 +144,8 @@ model Juego {
   objetoCorrectoId String
   objetoCorrecto   ObjetoEscenario @relation("OpcionCorrecta",fields: [objetoCorrectoId], references: [id])
 
-  objetoSeleccionadoId String
-  objetoSeleccionado   ObjetoEscenario @relation("ObjetoSeleccionado",fields: [objetoSeleccionadoId], references: [id])
+  objetoSeleccionadoId String?
+  objetoSeleccionado   ObjetoEscenario? @relation("ObjetoSeleccionado",fields: [objetoSeleccionadoId], references: [id])
 
   sesionJuegoId String
   sesionJuego   SesionJuego @relation(fields: [sesionJuegoId], references: [id])
@@ -175,7 +175,7 @@ model JuegoOpcion {
 model SesionJuego {
   id        String   @id @default(cuid())
   inicio     DateTime 
-  fin        DateTime
+  fin        DateTime?
   juegosTotales Int
   aciertos Int
   errores Int
