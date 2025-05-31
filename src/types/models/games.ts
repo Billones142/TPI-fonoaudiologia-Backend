@@ -6,7 +6,7 @@ export interface Scene {
 
 export interface SceneObject {
   name: string,
-  verticesLocation: [number, number][],
+  verticesLocation: Coordenates,
   imageUrl: string,
   videoUrl: string,
 }
@@ -23,6 +23,8 @@ export interface SceneObjectJWTPayload {
   variator: number,
   generationTime: number,
 }
+
+export type Coordenates = ArrayLike<[number, number]>;
 
 export interface Game {
   videoUrl: string,

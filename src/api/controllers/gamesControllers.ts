@@ -2,55 +2,17 @@ import { Handler, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { gamesSecret } from '../../config/env';
 import CryptoJS from 'crypto-js';
-import { Game, Scene, SceneObject, SceneObjectJWTPayload, SceneObjectToSelect } from '../../types/models/games';
+import { Coordenates, Game, Scene, SceneObject, SceneObjectJWTPayload, SceneObjectToSelect } from '../../types/models/games';
 import { CheckGameResult, GetGamesResponse } from '../../types/api/APIResponses';
-
-
-export const escenarios: Scene[] = [ // TODO: temporal mientras no hay base de datos
-  {
-    id: '123456',
-    name: 'cocina',
-    objects: [
-      {
-        name: 'Tenedor',
-        verticesLocation: [],
-        imageUrl: 'https://res.cloudinary.com/dhsx2g5ez/image/upload/tenedor_i24tpf.webp',
-        videoUrl: 'https://res.cloudinary.com/dhignxely/video/upload/v1746375570/fonoej_mzxth6.mp4',
-      },
-      {
-        name: 'Cuchillo',
-        verticesLocation: [],
-        imageUrl: 'https://res.cloudinary.com/dhsx2g5ez/image/upload/cuchillo_ovirp5.webp',
-        videoUrl: 'https://res.cloudinary.com/dhsx2g5ez/video/upload/Cuchillo.mp4',
-      },
-      {
-        name: 'Cuchara',
-        verticesLocation: [],
-        imageUrl: 'https://res.cloudinary.com/dhsx2g5ez/image/upload/cuchara_usbvwr.webp',
-        videoUrl: 'https://res.cloudinary.com/dhsx2g5ez/video/upload/Cuchara_jahdxg.mp4',
-      },
-      {
-        name: 'Microondas',
-        verticesLocation: [],
-        imageUrl: 'https://res.cloudinary.com/dhsx2g5ez/image/upload/microondas_plflqi.webp',
-        videoUrl: 'https://res.cloudinary.com/dhsx2g5ez/video/upload/microondas_yurgvz.mp4',
-      },
-      {
-        name: 'Lavarropas',
-        verticesLocation: [],
-        imageUrl: 'https://res.cloudinary.com/dhsx2g5ez/image/upload/image_xrozbw.webp',
-        videoUrl: 'https://res.cloudinary.com/dhsx2g5ez/video/upload/lavadora_aanpq9.mp4',
-      },
-    ],
-  },
-];
-
+import { prisma } from '../../lib/prisma';
+import { Prisma } from '@prisma/client';
 
 function getShuffledIndexes(array: Array<unknown>): Array<number> {
   return array.map((_, index) => index).sort(() => Math.random() - 0.5);
 }
 
 function encriptarSelectorObjeto(objeto: SceneObject, isGameResult: boolean, escenario: Scene, tiempoDeGeneracion: number): string {
+  // modificar por solo el id del objeto
   const payload: SceneObjectJWTPayload = {
     isGameResult: isGameResult,
     objectName: objeto.name,
@@ -84,57 +46,139 @@ function desencriptarSelectorObjeto(encryptedJWT: string): SceneObjectJWTPayload
  * @param jokerObjectsAmmount ammout of objects that will be added with co
  * @returns 
  */
-async function generarJuegosAleatorios(sceneId: string, jokerObjectsAmmount: number): Promise<Array<Game>> { // Encriptar JWT
-  const escenario = escenarios.find(escenario => escenario.id === sceneId);
+async function generarJuegosAleatorios(sceneId: string, jokerObjectsAmmount: number, profileId: string): Promise<Array<Game>> {
+  // Buscar el escenario en la base de datos
+  const escenario = await prisma.escenario.findUnique({
+    where: { id: sceneId },
+    include: {
+      objetos: true,
+    },
+  });
 
   if (!escenario) {
     throw new Error('No scene with that id found');
   }
 
   const tiempoDeGeneracion = Date.now();
-
   const shuffledGames: Array<Game> = [];
 
   // For each object in the scene, create a game where it's the correct one
-  escenario.objects.forEach((_, correctObjectIndex) => {
+  for (const correctObject of escenario.objetos) {
     // Shuffle and take the amount of jokers needed
-    const jokerObjectsIndexes = getShuffledIndexes(escenario.objects)
-      .filter(jokerIndex => escenario.objects[jokerIndex].name !== escenario.objects[correctObjectIndex].name)
+    const jokerObjects = escenario.objetos
+      .filter(obj => obj.id !== correctObject.id)
+      .sort(() => Math.random() - 0.5)
       .slice(0, jokerObjectsAmmount);
 
-    const principalObject = {
-      ...escenario.objects[correctObjectIndex],
-      selectionId: encriptarSelectorObjeto(escenario.objects[correctObjectIndex], true, escenario, tiempoDeGeneracion),
+    const principalObject: SceneObjectToSelect = {
+      name: correctObject.nombre,
+      verticesLocation: JSON.parse(correctObject.coordenadas) as Coordenates,
+      imageUrl: correctObject.imagenUrl,
+      videoUrl: correctObject.videoSenaUrl,
+      selectionId: encriptarSelectorObjeto(
+        {
+          name: correctObject.nombre,
+          verticesLocation: JSON.parse(correctObject.coordenadas) as Coordenates,
+          imageUrl: correctObject.imagenUrl,
+          videoUrl: correctObject.videoSenaUrl,
+        },
+        true,
+        {
+          id: escenario.id,
+          name: escenario.nombre,
+          objects: escenario.objetos.map(obj => ({
+            name: obj.nombre,
+            verticesLocation: JSON.parse(obj.coordenadas) as Coordenates,
+            imageUrl: obj.imagenUrl,
+            videoUrl: obj.videoSenaUrl,
+          })),
+        },
+        tiempoDeGeneracion,
+      ),
     };
 
-    const jokerObjects = jokerObjectsIndexes.map(jokerIndex => ({
-      ...escenario.objects[jokerIndex],
-      selectionId: encriptarSelectorObjeto(escenario.objects[jokerIndex], false, escenario, tiempoDeGeneracion),
+    const jokerObjectsWithIds: SceneObjectToSelect[] = jokerObjects.map(jokerObject => ({
+      name: jokerObject.nombre,
+      verticesLocation: JSON.parse(jokerObject.coordenadas) as Coordenates,
+      imageUrl: jokerObject.imagenUrl,
+      videoUrl: jokerObject.videoSenaUrl,
+      selectionId: encriptarSelectorObjeto(
+        {
+          name: jokerObject.nombre,
+          verticesLocation: JSON.parse(jokerObject.coordenadas) as Coordenates,
+          imageUrl: jokerObject.imagenUrl,
+          videoUrl: jokerObject.videoSenaUrl,
+        },
+        false,
+        {
+          id: escenario.id,
+          name: escenario.nombre,
+          objects: escenario.objetos.map(obj => ({
+            name: obj.nombre,
+            verticesLocation: JSON.parse(obj.coordenadas) as Coordenates,
+            imageUrl: obj.imagenUrl,
+            videoUrl: obj.videoSenaUrl,
+          })),
+        },
+        tiempoDeGeneracion,
+      ),
     }));
 
-    const objectsForGame = [principalObject, ...jokerObjects];
+    const objectsForGame = [principalObject, ...jokerObjectsWithIds];
     const shuffledObjectsForGame: SceneObjectToSelect[] = [];
     const shuffledObjectIndexes = getShuffledIndexes(objectsForGame);
 
     shuffledObjectIndexes.forEach(objectIndex => {
-      shuffledObjectsForGame.push(objectsForGame[objectIndex]);
+      shuffledObjectsForGame.push(objectsForGame[objectIndex]); // TODO: buscar error donde el primero siempre es el correcto
     });
 
     shuffledGames.push({
       videoUrl: principalObject.videoUrl,
       objects: shuffledObjectsForGame,
     });
+  }
+
+  const generationTime = new Date();
+  // TODO: agregar a la base de datos cada juego
+  await prisma.sesionJuego.create({
+    data: {
+      aciertos: 0,
+      errores: 0,
+      inicio: generationTime,
+      juegosTotales: shuffledGames.length,
+      escenarioId: sceneId,
+      perfilId: profileId,
+      juegos: {
+        createMany: {
+          data: [
+            ...shuffledGames.map<Prisma.JuegoCreateManySesionJuegoInput>(game => {
+              const objetoCorrectoId = escenario.objetos.find(objeto => objeto.videoSenaUrl === game.videoUrl)?.id as string;
+              return {
+                objetoCorrectoId: objetoCorrectoId,
+              };
+            }),
+          ],
+        },
+      },
+    },
   });
+
 
   return shuffledGames;
 }
 
+/**
+ * @method GET
+ * @param req 
+ * @param res 
+ */
 export const getGames: Handler = async (req: Request, res: Response) => {
   const { sceneId } = req.params;
   let apiResponse: GetGamesResponse;
 
   try {
-    const juegos = await generarJuegosAleatorios(sceneId, 2);
+    const perfil = await prisma.perfil.findMany(); // TODO: solo para tests
+    const juegos = await generarJuegosAleatorios(sceneId, 2, perfil[0].id); // TODO: Check profile id
 
     apiResponse = {
       status: 'ok',
@@ -159,6 +203,34 @@ export const getGames: Handler = async (req: Request, res: Response) => {
   res.json(apiResponse);
 };
 
+async function procesarRespuestaEnBaseDeDatos(objectSelectionIdPayload: SceneObjectJWTPayload) { // TODO
+  const progresoAnterior = await prisma.progresoEscenario.findFirst({
+    where: {
+      escenarioId: objectSelectionIdPayload.sceneId,
+    },
+  });
+
+  if (!progresoAnterior) {
+    throw new Error('El escenario al que el objeto hace referencia no existe');
+  }
+
+  const sesionJuego = await prisma.sesionJuego.findFirst({
+    where: {
+
+    },
+  });// TODO: borrar
+
+  if (objectSelectionIdPayload.isGameResult) {
+    // TODO: agregar una forma para no permitir que puedan enviar varias veces el mismo
+    await prisma.progresoEscenario.update({
+      where: { id: progresoAnterior.id },
+      data: {
+        objetosReconocidos: progresoAnterior.objetosTotales + 1, // TODO: modificar por una lista de los ID?
+      },
+    });
+  }
+}
+
 export const checkGameResult: Handler = async (req: Request, res: Response): Promise<void> => { // TODO: agregar conexion a la base de datos
   const { selectionId } = req.params;
 
@@ -168,9 +240,10 @@ export const checkGameResult: Handler = async (req: Request, res: Response): Pro
 
   let apiResponse: CheckGameResult;
 
-  // TODO: agregar uso de interfaz para la respuesta
   try {
     const decryptedPayload = desencriptarSelectorObjeto(selectionId);
+
+    await procesarRespuestaEnBaseDeDatos(decryptedPayload);
 
     apiResponse = {
       status: 'ok',
