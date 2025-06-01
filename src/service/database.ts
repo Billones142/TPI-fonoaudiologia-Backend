@@ -1,9 +1,13 @@
+import { Role } from '@prisma/client';
+import { prisma } from '../lib/prisma';
 
-const allowedUsers: { [key: string]: string } = {
-  'prueba1': '123456',
-};
+export async function verifyUser(username: string, userPassword: string): Promise<{ name: string; id: string; email: string; password: string; rol: Role; medicoId: string | null; createdAt: Date; updatedAt: Date; } | null> {
+  const userData = await prisma.usuario.findFirst({
+    where: {
+      name: username,
+      password: userPassword, // TODO: encrypt
+    },
+  });
 
-// TODO: add database
-export async function verifyUser(username: string, userPassword: string): Promise<boolean> {
-  return allowedUsers[username] === userPassword;
+  return userData;
 }

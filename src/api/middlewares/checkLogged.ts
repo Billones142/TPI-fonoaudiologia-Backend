@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction, Handler } from 'express';
 import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
 import { secretKey } from '../../config/env';
+import { User } from '../../types/models/User';
 
 const router = express.Router();
 router.use(cookieParser());
@@ -27,14 +28,10 @@ export const userLoggedCheckMiddleware: Handler = async (req: Request, res: Resp
       message: 'No session token',
     });
   } else {
-    try {
-      const payload = jwt.verify(sessionid, secretKey) as { user: string };
-      req.user = { username: payload.user };
-      next();
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error(error);
-      }
-    }
+    const payload = jwt.verify(sessionid, secretKey) as User;
+    req.user = payload;
+    next();
+    // TODO: add user data to the req
   }
 };
+
