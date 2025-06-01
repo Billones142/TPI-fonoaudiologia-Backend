@@ -6,6 +6,7 @@ export interface Scene {
 
 export interface SceneObject {
   name: string,
+  id: string,
   verticesLocation: Coordenates,
   imageUrl: string,
   videoUrl: string,
@@ -18,9 +19,8 @@ export interface SceneObjectToSelect extends SceneObject {
 
 export interface SceneObjectJWTPayload {
   isGameResult: boolean,
-  objectName: string,
-  sceneId: string,
-  variator: number,
+  sessionId: string,
+  objectId: string,
   generationTime: number,
 }
 
