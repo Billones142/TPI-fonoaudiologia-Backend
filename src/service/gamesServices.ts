@@ -83,7 +83,6 @@ export async function generarJuegosAleatorios(sceneId: string, jokerObjectsAmmou
 
     const principalObject: SceneObjectToSelect = {
       name: correctObject.nombre,
-      verticesLocation: JSON.parse(correctObject.coordenadas) as Coordenates,
       imageUrl: correctObject.imagenUrl,
       videoUrl: correctObject.videoSenaUrl,
       id: correctObject.id,
@@ -97,7 +96,6 @@ export async function generarJuegosAleatorios(sceneId: string, jokerObjectsAmmou
 
     const jokerObjectsWithIds: SceneObjectToSelect[] = jokerObjects.map(jokerObject => ({
       name: jokerObject.nombre,
-      verticesLocation: JSON.parse(jokerObject.coordenadas) as Coordenates,
       imageUrl: jokerObject.imagenUrl,
       videoUrl: jokerObject.videoSenaUrl,
       id: jokerObject.id,
