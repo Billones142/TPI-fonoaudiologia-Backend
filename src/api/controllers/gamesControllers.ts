@@ -1,180 +1,53 @@
 import { Handler, Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
-import { gamesSecret } from '../../config/env';
-import CryptoJS from 'crypto-js';
 
+import { prisma } from '../../lib/prisma';
+import { CheckGameResult, GetGamesResponse } from '../../types/api/APIResponses';
+import { desencriptarSelectorObjeto, generarJuegosAleatorios, procesarRespuestaEnBaseDeDatos } from '../../service/gamesServices';
 
-export const escenarios: Scene[] = [ // TODO: temporal mientras no hay base de datos
-  {
-    id: '123456',
-    name: 'cocina',
-    objects: [
-      {
-        name: 'Tenedor',
-        verticesLocation: [],
-        imageUrl: 'https://res.cloudinary.com/dhsx2g5ez/image/upload/tenedor_i24tpf.webp',
-        videoUrl: 'https://res.cloudinary.com/dhignxely/video/upload/v1746375570/fonoej_mzxth6.mp4',
-      },
-      {
-        name: 'Cuchillo',
-        verticesLocation: [],
-        imageUrl: 'https://res.cloudinary.com/dhsx2g5ez/image/upload/cuchillo_ovirp5.webp',
-        videoUrl: 'https://res.cloudinary.com/dhsx2g5ez/video/upload/Cuchillo.mp4',
-      },
-      {
-        name: 'Cuchara',
-        verticesLocation: [],
-        imageUrl: 'https://res.cloudinary.com/dhsx2g5ez/image/upload/cuchara_usbvwr.webp',
-        videoUrl: 'https://res.cloudinary.com/dhsx2g5ez/video/upload/Cuchara_jahdxg.mp4',
-      },
-      {
-        name: 'Microondas',
-        verticesLocation: [],
-        imageUrl: 'https://res.cloudinary.com/dhsx2g5ez/image/upload/microondas_plflqi.webp',
-        videoUrl: 'https://res.cloudinary.com/dhsx2g5ez/video/upload/microondas_yurgvz.mp4',
-      },
-      {
-        name: 'Lavarropas',
-        verticesLocation: [],
-        imageUrl: 'https://res.cloudinary.com/dhsx2g5ez/image/upload/image_xrozbw.webp',
-        videoUrl: 'https://res.cloudinary.com/dhsx2g5ez/video/upload/lavadora_aanpq9.mp4',
-      },
-    ],
-  },
-];
-
-interface Scene {
-  id: string,
-  name: string,
-  objects: SceneObject[],
-}
-
-interface SceneObject {
-  name: string,
-  verticesLocation: [number, number][],
-  imageUrl: string,
-  videoUrl: string,
-}
-
-export interface SceneObjectToSelect extends SceneObject {
-  /** JWT that will contain in the payload if it is correct or not */
-  selectionId: string,
-}
-
-interface SceneObjectJWTPayload {
-  isGameResult: boolean,
-  objectName: string,
-  sceneId: string,
-  variator: number,
-  generationTime: number,
-}
-
-function getShuffledIndexes(array: Array<unknown>): Array<number> {
-  return array.map((_, index) => index).sort(() => Math.random() - 0.5);
-}
-
-function encriptarSelectorObjeto(objeto: SceneObject, isGameResult: boolean, escenario: Scene, tiempoDeGeneracion: number): string {
-  const payload: SceneObjectJWTPayload = {
-    isGameResult: isGameResult,
-    objectName: objeto.name,
-    sceneId: escenario.id,
-    variator: Math.random(), // payload to alter the final jwt and make it diferent
-    generationTime: tiempoDeGeneracion,
-  };
-
-  // Encriptar el payload
-
-  const encryptedPayload = CryptoJS.AES.encrypt(JSON.stringify(payload), gamesSecret).toString();
-
-  const token = jwt.sign({ data: encryptedPayload }, gamesSecret, { expiresIn: '1h' });
-
-  return token;
-}
-
-function desencriptarSelectorObjeto(encryptedJWT: string): SceneObjectJWTPayload {
-  const decoded = jwt.verify(encryptedJWT, gamesSecret) as { data: string };
-
-  const decryptedBytes = CryptoJS.AES.decrypt(decoded.data, gamesSecret);
-
-  const decryptedPayload = JSON.parse(decryptedBytes.toString(CryptoJS.enc.Utf8)) as SceneObjectJWTPayload;
-
-  return decryptedPayload;
-}
-
-export interface Game {
-  videoUrl: string,
-  objects: SceneObjectToSelect[],
-}
 
 /**
- * 
- * @param sceneId 
- * @param jokerObjectsAmmount ammout of objects that will be added with co
- * @returns 
+ * @method GET
+ * @param req 
+ * @param res 
  */
-async function generarJuegosAleatorios(sceneId: string, jokerObjectsAmmount: number): Promise<Array<Game>> { // Encriptar JWT
-  const escenario = escenarios.find(escenario => escenario.id === sceneId);
-
-  if (!escenario) {
-    throw new Error('No scene with that id found');
-  }
-
-  const tiempoDeGeneracion = Date.now();
-
-  const shuffledGames: Array<Game> = [];
-
-  // For each object in the scene, create a game where it's the correct one
-  escenario.objects.forEach((_, correctObjectIndex) => {
-    // Shuffle and take the amount of jokers needed
-    const jokerObjectsIndexes = getShuffledIndexes(escenario.objects)
-      .filter(jokerIndex => escenario.objects[jokerIndex].name !== escenario.objects[correctObjectIndex].name)
-      .slice(0, jokerObjectsAmmount);
-
-    const principalObject = {
-      ...escenario.objects[correctObjectIndex],
-      selectionId: encriptarSelectorObjeto(escenario.objects[correctObjectIndex], true, escenario, tiempoDeGeneracion),
-    };
-
-    const jokerObjects = jokerObjectsIndexes.map(jokerIndex => ({
-      ...escenario.objects[jokerIndex],
-      selectionId: encriptarSelectorObjeto(escenario.objects[jokerIndex], false, escenario, tiempoDeGeneracion),
-    }));
-
-    const objectsForGame = [principalObject, ...jokerObjects];
-    const shuffledObjectsForGame: SceneObjectToSelect[] = [];
-    const shuffledObjectIndexes = getShuffledIndexes(objectsForGame);
-
-    shuffledObjectIndexes.forEach(objectIndex => {
-      shuffledObjectsForGame.push(objectsForGame[objectIndex]);
-    });
-
-    shuffledGames.push({
-      videoUrl: principalObject.videoUrl,
-      objects: shuffledObjectsForGame,
-    });
-  });
-
-  return shuffledGames;
-}
-
 export const getGames: Handler = async (req: Request, res: Response) => {
   const { sceneId } = req.params;
+  let apiResponse: GetGamesResponse;
 
   try {
-    const juegos = await generarJuegosAleatorios(sceneId, 2);
+    const perfil = await prisma.perfil.findMany(); // TODO: solo para tests
+    const juegos = await generarJuegosAleatorios(sceneId, 2, perfil[0].id); // TODO: Check profile id
 
-    res.json({
-      gamesData: juegos,
-    });
+    apiResponse = {
+      status: 'ok',
+      games_data: juegos,
+    };
   } catch (error) {
     if (error instanceof Error) {
-      res.status(404).json({ message: error.message });
+      console.error(`escena con id ${sceneId} no encontrado`);
+      apiResponse = {
+        status: 'error',
+        error: ['game not found', error.message],
+      };
+      res.status(404);
     } else {
-      res.status(500).json({ message: error });
+      apiResponse = {
+        status: 'error',
+        error: [String(error)],
+      };
+      res.status(500);
     }
   }
+
+  res.json(apiResponse);
 };
 
+/**
+ * recibe como parametro "selectionId" con el cual responde si la respuesta fue correcta y tambien guarda el resultado en la base de datos
+ * @method POST
+ * @param req 
+ * @param res 
+ */
 export const checkGameResult: Handler = async (req: Request, res: Response): Promise<void> => { // TODO: agregar conexion a la base de datos
   const { selectionId } = req.params;
 
@@ -182,34 +55,43 @@ export const checkGameResult: Handler = async (req: Request, res: Response): Pro
     throw new Error('Selection id is not a string');
   }
 
+  let apiResponse: CheckGameResult;
+
   try {
     const decryptedPayload = desencriptarSelectorObjeto(selectionId);
-    if (decryptedPayload.isGameResult) {
-      res.json({
-        isCorrect: true,
-      });
-    } else {
-      res.json({
-        isCorrect: false,
-      });
-    }
+
+    await procesarRespuestaEnBaseDeDatos(decryptedPayload);
+
+    apiResponse = {
+      status: 'ok',
+      scene_id: decryptedPayload.sceneId,
+      is_correct: decryptedPayload.isGameResult,
+      object_name: decryptedPayload.objectName,
+    };
+    res.json(apiResponse);
   } catch (error) {
     if (error instanceof Error) {
       if (error.name === 'JsonWebTokenError' && error.message === 'invalid signature') {
-        res.status(406) // code 406: not acceptable
-          .json({
-            message: 'The token was not valid',
-          });
+        apiResponse = {
+          status: 'error',
+          error: ['The token was not valid'],
+        };
+        res.status(406); // code 406: not acceptable
       } else {
-        res.status(406)
-          .json({
-            error: error.message,
-          });
+        apiResponse = {
+          status: 'error',
+          error: [error.message],
+        };
+        res.status(406);
       }
     } else {
-      res.status(500).json({
-        error: error,
-      });
+      apiResponse = {
+        status: 'error',
+        error: [String(error)],
+      };
+      res.status(500);
     }
   }
+
+  res.json(apiResponse);
 };

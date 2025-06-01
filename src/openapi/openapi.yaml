@@ -1,0 +1,257 @@
+openapi: 3.0.0
+info:
+  title: Fonoaudiología Backend API
+  version: 0.0.1
+  description: API para el sistema de fonoaudiología
+
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Servidor de desarrollo local
+  - url: https://tpi-fonoaudiologia-backend.onrender.com/api/v1
+    description: Servidor de deploy en Render
+
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: sessionid
+    profileCookie:
+      type: apiKey
+      in: cookie
+      name: profilesession
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [error]
+        error:
+          type: array
+          items:
+            type: string
+
+    Game:
+      type: object
+      properties:
+        videoUrl:
+          type: string
+        objects:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              verticesLocation:
+                type: array
+                items:
+                  type: array
+                  items:
+                    type: number
+              imageUrl:
+                type: string
+              videoUrl:
+                type: string
+              selectionId:
+                type: string
+
+    GetGamesResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ok, error]
+        games_data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Game'
+        error:
+          type: array
+          items:
+            type: string
+
+    CheckGameResult:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ok, error]
+        scene_id:
+          type: string
+        is_correct:
+          type: boolean
+        object_name:
+          type: string
+        error:
+          type: array
+          items:
+            type: string
+
+    LoginRequest:
+      type: object
+      properties:
+        user:
+          type: string
+        password:
+          type: string
+
+    LoginResponse:
+      type: object
+      properties:
+        message:
+          type: string
+
+    Profile:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        avatar_url:
+          type: string
+
+    GetProfilesResponse:
+      type: object
+      properties:
+        profiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Profile'
+
+paths:
+  /games/{sceneId}:
+    get:
+      tags:
+        - Games
+      summary: Obtiene los juegos para un escenario específico
+      security:
+        - sessionCookie: []
+        - profileCookie: []
+      parameters:
+        - name: sceneId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Juegos obtenidos exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetGamesResponse'
+        '404':
+          description: Escenario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /games/submitSelection/{selectionId}:
+    post:
+      tags:
+        - Games
+      summary: Verifica si la selección del usuario es correcta
+      security:
+        - sessionCookie: []
+        - profileCookie: []
+      parameters:
+        - name: selectionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Resultado verificado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckGameResult'
+        '406':
+          description: Token no válido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /user/login:
+    post:
+      tags:
+        - Authentication
+      summary: Inicia sesión de usuario
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login exitoso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: sessionid=abc123; HttpOnly
+        '401':
+          description: Credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /user/profiles:
+    get:
+      tags:
+        - User
+      summary: Obtiene los perfiles del usuario
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Perfiles obtenidos exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetProfilesResponse'
+
+  /user/selectProfile:
+    post:
+      tags:
+        - User
+      summary: Selecciona un perfil de usuario
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: profile_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Perfil seleccionado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: profilesession=xyz789; HttpOnly
+        '404':
+          description: Perfil no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error' 

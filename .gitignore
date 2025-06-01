@@ -1,3 +1,9 @@
+# builded api tools
+src/openapi/api-fonoaudiologia
+
+# builded executable
+fonoBackEndServer.*
+
 # dependencies (bun install)
 node_modules
 
