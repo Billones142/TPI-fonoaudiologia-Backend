@@ -9,14 +9,13 @@ export function getShuffledIndexes(array: Array<unknown>): Array<number> {
   return array.map((_, index) => index).sort(() => Math.random() - 0.5);
 }
 
-export function encriptarSelectorObjeto(objeto: SceneObject, isGameResult: boolean, escenario: Scene, tiempoDeGeneracion: number): string {
+export function encriptarSelectorObjeto(objectId: string, sessionId: string, isGameResult: boolean, generationTime: number): string {
   // modificar por solo el id del objeto
   const payload: SceneObjectJWTPayload = {
     isGameResult: isGameResult,
-    objectName: objeto.name,
-    sceneId: escenario.id,
-    variator: Math.random(), // payload to alter the final jwt and make it diferent
-    generationTime: tiempoDeGeneracion,
+    objectId: objectId,
+    sessionId: sessionId,
+    generationTime: generationTime,
   };
 
   // Encriptar el payload
@@ -58,6 +57,20 @@ export async function generarJuegosAleatorios(sceneId: string, jokerObjectsAmmou
   }
 
   const tiempoDeGeneracion = Date.now();
+  const generationTime = new Date();
+
+  // se crea la sesion de juego
+  const sessionJuego = await prisma.sesionJuego.create({
+    data: {
+      aciertos: 0,
+      errores: 0,
+      inicio: generationTime,
+      juegosTotales: escenario.objetos.length,
+      escenarioId: sceneId,
+      perfilId: profileId,
+    },
+  });
+
   const shuffledGames: Array<Game> = [];
 
   // For each object in the scene, create a game where it's the correct one
@@ -73,24 +86,11 @@ export async function generarJuegosAleatorios(sceneId: string, jokerObjectsAmmou
       verticesLocation: JSON.parse(correctObject.coordenadas) as Coordenates,
       imageUrl: correctObject.imagenUrl,
       videoUrl: correctObject.videoSenaUrl,
+      id: correctObject.id,
       selectionId: encriptarSelectorObjeto(
-        {
-          name: correctObject.nombre,
-          verticesLocation: JSON.parse(correctObject.coordenadas) as Coordenates,
-          imageUrl: correctObject.imagenUrl,
-          videoUrl: correctObject.videoSenaUrl,
-        },
+        correctObject.id,
+        sessionJuego.id,
         true,
-        {
-          id: escenario.id,
-          name: escenario.nombre,
-          objects: escenario.objetos.map(obj => ({
-            name: obj.nombre,
-            verticesLocation: JSON.parse(obj.coordenadas) as Coordenates,
-            imageUrl: obj.imagenUrl,
-            videoUrl: obj.videoSenaUrl,
-          })),
-        },
         tiempoDeGeneracion,
       ),
     };
@@ -100,24 +100,11 @@ export async function generarJuegosAleatorios(sceneId: string, jokerObjectsAmmou
       verticesLocation: JSON.parse(jokerObject.coordenadas) as Coordenates,
       imageUrl: jokerObject.imagenUrl,
       videoUrl: jokerObject.videoSenaUrl,
+      id: jokerObject.id,
       selectionId: encriptarSelectorObjeto(
-        {
-          name: jokerObject.nombre,
-          verticesLocation: JSON.parse(jokerObject.coordenadas) as Coordenates,
-          imageUrl: jokerObject.imagenUrl,
-          videoUrl: jokerObject.videoSenaUrl,
-        },
+        jokerObject.id,
+        sessionJuego.id,
         false,
-        {
-          id: escenario.id,
-          name: escenario.nombre,
-          objects: escenario.objetos.map(obj => ({
-            name: obj.nombre,
-            verticesLocation: JSON.parse(obj.coordenadas) as Coordenates,
-            imageUrl: obj.imagenUrl,
-            videoUrl: obj.videoSenaUrl,
-          })),
-        },
         tiempoDeGeneracion,
       ),
     }));
@@ -136,16 +123,12 @@ export async function generarJuegosAleatorios(sceneId: string, jokerObjectsAmmou
     });
   }
 
-  const generationTime = new Date();
-  // TODO: agregar a la base de datos cada juego
-  await prisma.sesionJuego.create({
+  // se agregan los juegos creados a la sesion de juego
+  await prisma.sesionJuego.update({
+    where: {
+      id: sessionJuego.id,
+    },
     data: {
-      aciertos: 0,
-      errores: 0,
-      inicio: generationTime,
-      juegosTotales: shuffledGames.length,
-      escenarioId: sceneId,
-      perfilId: profileId,
       juegos: {
         createMany: {
           data: [
@@ -165,30 +148,54 @@ export async function generarJuegosAleatorios(sceneId: string, jokerObjectsAmmou
   return shuffledGames;
 }
 
-export async function procesarRespuestaEnBaseDeDatos(objectSelectionIdPayload: SceneObjectJWTPayload) { // TODO
-  const progresoAnterior = await prisma.progresoEscenario.findFirst({
+export async function procesarRespuestaEnBaseDeDatos(selectionId: string): Promise<SceneObjectJWTPayload> {
+  const objectSelectionIdPayload = desencriptarSelectorObjeto(selectionId);
+
+  // TODO: chequear que el id lo envia el mismo usuario y perfil
+  // TODO: agregar una forma para no permitir que puedan enviar varias veces el mismo, encontrar el juego del objeto mediante la sesion de juego
+
+  const juego = await prisma.juego.findFirst({
     where: {
-      escenarioId: objectSelectionIdPayload.sceneId,
+      sesionJuegoId: objectSelectionIdPayload.sessionId,
+    }
+  });
+
+  if (!juego) {
+    throw new Error('No se encontro el juego al que el selector hace referencia');
+  }
+
+  await prisma.juego.update({
+    where: {
+      id: juego.id,
+    },
+    data: {
+      objetoSeleccionadoId: objectSelectionIdPayload.objectId,
     },
   });
 
-  if (!progresoAnterior) {
-    throw new Error('El escenario al que el objeto hace referencia no existe');
-  }
-
-  const sesionJuego = await prisma.sesionJuego.findFirst({
-    where: {
-
-    },
-  });// TODO: borrar
-
   if (objectSelectionIdPayload.isGameResult) {
-    // TODO: agregar una forma para no permitir que puedan enviar varias veces el mismo
-    await prisma.progresoEscenario.update({
-      where: { id: progresoAnterior.id },
+    await prisma.sesionJuego.update({
+      where: {
+        id: objectSelectionIdPayload.sessionId,
+      },
       data: {
-        objetosReconocidos: progresoAnterior.objetosTotales + 1, // TODO: modificar por una lista de los ID?
+        aciertos: {
+          increment: 1
+        }
+      },
+    });
+  } else {
+    await prisma.sesionJuego.update({
+      where: {
+        id: objectSelectionIdPayload.sessionId,
+      },
+      data: {
+        errores: {
+          increment: 1
+        }
       },
     });
   }
+
+  return objectSelectionIdPayload;
 }

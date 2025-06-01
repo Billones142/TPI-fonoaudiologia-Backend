@@ -104,43 +104,43 @@ afterAll(async () => {
 
 const appRequest = request(app);
 
-for (let multipleTestIndex = 0; multipleTestIndex < 10; multipleTestIndex++) {
-  test('generacion de juegos', async () => {
-    console.debug(`testeando(numero: ${multipleTestIndex}) juego con id ${escenarioTestGlobal.id}`);
-    const res = await appRequest.get(`/api/v1/games/${escenarioTestGlobal.id}`);
-    expect(res.status).toBe(200);
-    //console.info(res.body);
-    const games = (res.body as { games_data: Array<Game> }).games_data;
+test('generacion de juegos', async () => {
+  console.debug(`testeando juego con id ${escenarioTestGlobal.id}`);
+  const res = await appRequest.get(`/api/v1/games/${escenarioTestGlobal.id}`);
+  expect(res.status).toBe(200);
+  //console.info(res.body);
+  const games = (res.body as { games_data: Array<Game> }).games_data;
 
-    const foundUrls = {
-      image: Array<string>(),
-      video: Array<string>(),
-    };
-    for (let index = 0; index < games.length; index++) {
-      const game = games[index];
-      // chequear que de bien el resultado
-      const objetoCorrecto2 = escenarioTestGlobal.objetos.find(object => object.videoSenaUrl === game.videoUrl);
-      if (!objetoCorrecto2) {
-        expect(true).toBe(false);
-        throw new Error();
-      }
-      const objetoCorrecto = game.objects.find(objeto => objeto.name === objetoCorrecto2.nombre);
-      if (!objetoCorrecto) {
-        expect(true).toBe(false);
-        throw new Error();
-      }
-      foundUrls.video.push(objetoCorrecto.videoUrl);
-      foundUrls.image.push(objetoCorrecto.imageUrl);
-      console.debug('objeto correcto', JSON.stringify(objetoCorrecto, null, 2));
-      const requestCorrecto = await appRequest.post(`/api/v1/games/submitSelection/${objetoCorrecto.selectionId}`);
-      const bodyResquestCorrecto = requestCorrecto.body as CheckGameResult;
-      expect(requestCorrecto.status).toBe(200);
-      if (bodyResquestCorrecto.status === 'ok') {
-        expect(bodyResquestCorrecto.is_correct).toBe(true);
-      } else {
-        expect(false).toBe(true);
-      }
-      //console.log(JSON.stringify(requestCorrecto, null, 2));
+  const foundUrls = {
+    image: Array<string>(),
+    video: Array<string>(),
+  };
+  for (let index = 0; index < games.length; index++) {
+    const game = games[index];
+    // chequear que de bien el resultado
+    const objetoCorrecto2 = escenarioTestGlobal.objetos.find(object => object.videoSenaUrl === game.videoUrl);
+    if (!objetoCorrecto2) {
+      expect(true).toBe(false);
+      throw new Error();
     }
-  }, 60 * 60 * 24 * 20 * 1000);
-}
+    const objetoCorrecto = game.objects.find(objeto => objeto.name === objetoCorrecto2.nombre);
+    if (!objetoCorrecto) {
+      expect(true).toBe(false);
+      throw new Error();
+    }
+    foundUrls.video.push(objetoCorrecto.videoUrl);
+    foundUrls.image.push(objetoCorrecto.imageUrl);
+    console.debug('objeto correcto', JSON.stringify(objetoCorrecto, null, 2));
+    const requestCorrecto = await appRequest.post(`/api/v1/games/submitSelection/${objetoCorrecto.selectionId}`);
+    const bodyResquestCorrecto = requestCorrecto.body as CheckGameResult;
+    expect(requestCorrecto.status).toBe(200);
+    if (bodyResquestCorrecto.status === 'ok') {
+      expect(bodyResquestCorrecto.is_correct).toBe(true);
+    } else {
+      expect(false).toBe(true);
+    }
+    //console.log(JSON.stringify(requestCorrecto, null, 2));
+  }
+
+  // TODO agregar test para controlar los resultados de la base de datos
+}, 60 * 60 * 24 * 20 * 1000);

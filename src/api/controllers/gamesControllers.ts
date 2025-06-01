@@ -58,17 +58,14 @@ export const checkGameResult: Handler = async (req: Request, res: Response): Pro
   let apiResponse: CheckGameResult;
 
   try {
-    const decryptedPayload = desencriptarSelectorObjeto(selectionId);
-
-    await procesarRespuestaEnBaseDeDatos(decryptedPayload);
+    const decryptedPayload = await procesarRespuestaEnBaseDeDatos(selectionId);
 
     apiResponse = {
       status: 'ok',
-      scene_id: decryptedPayload.sceneId,
+      game_session_id: decryptedPayload.sessionId,
       is_correct: decryptedPayload.isGameResult,
-      object_name: decryptedPayload.objectName,
+      object_id: decryptedPayload.objectId,
     };
-    res.json(apiResponse);
   } catch (error) {
     if (error instanceof Error) {
       if (error.name === 'JsonWebTokenError' && error.message === 'invalid signature') {

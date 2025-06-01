@@ -25,8 +25,8 @@ interface GetGamesResponse_Fail extends APIResponse_Error { // TODO: ver si es n
 
 interface CheckGameResult_Ok extends APIResponse_Ok {
   is_correct: boolean,
-  scene_id: string,
-  object_name: string,
+  game_session_id: string,
+  object_id: string,
 }
 
 export type GetGamesResponse = GetGamesResponse_Ok | APIResponse_Error;
