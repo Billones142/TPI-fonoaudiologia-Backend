@@ -7,7 +7,7 @@ export interface Scene {
 export interface SceneObject {
   name: string,
   id: string,
-  verticesLocation: Coordenates,
+  verticesLocation?: Coordenates,
   imageUrl: string,
   videoUrl: string,
 }
