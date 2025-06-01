@@ -10,13 +10,12 @@
     "prisma-dev-migrate": "bunx --bun prisma migrate dev"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.1",
-    "@eslint/js": "^9.27.0",
     "@types/bun": "latest",
     "@types/cookie-parser": "^1.4.8",
     "@types/express": "^5.0.1",
-    "eslint": "^9.27.0",
-    "globals": "^16.2.0"
+    "eslint": "^8.56.0",
+    "globals": "^16.2.0",
+    "openapi-typescript-codegen": "^0.29.0"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -35,7 +34,7 @@
     "express": "^5.1.0",
     "jest": "^29.7.0",
     "jsonwebtoken": "^9.0.2",
-    "supertest": "^7.1.1",
-    "prisma": "^6.8.2"
+    "prisma": "^6.8.2",
+    "supertest": "^7.1.1"
   }
 }
