@@ -2,6 +2,8 @@ import jwt from 'jsonwebtoken';
 import { Handler, Request, Response } from 'express';
 import { secretKey } from '../../config/env';
 import { verifyUser } from '../../service/database';
+import { User } from '../../types/models/User';
+import { prisma } from '../../lib/prisma';
 
 const cookiesExpireMinutes = 60 * 60;
 
@@ -32,8 +34,13 @@ export const loginController: Handler = async (req: Request, res: Response) => {
     return;
   }
 
+
   const expires = new Date(Date.now() + (cookiesExpireMinutes * 1000)); // 60 minutos
-  const generatedToken = jwt.sign({ user: user }, secretKey, { expiresIn: cookiesExpireMinutes });
+  const payloadData: User = {
+    username: verified.name,
+    userId: verified.id,
+  };
+  const generatedToken = jwt.sign(payloadData, secretKey, { expiresIn: cookiesExpireMinutes });
   res.cookie('sessionid', generatedToken, { secure: false, httpOnly: true, expires: expires });
   res.status(200).json({ message: 'Login successful' });
 };
@@ -55,12 +62,20 @@ export const getUserProfilesController: Handler = async (req: Request, res: Resp
  * @param res 
  */
 export const getUserProfiles: Handler = async (req: Request, res: Response) => { //TODO: completar con logica de la base de datos
+  const userProfiles = await prisma.perfil.findMany({
+    where: {
+      usuarioId: req.user?.userId,
+    },
+  });
   res.json({
     profiles: [
-      {
-        name: 'juan',
-        id: '42',
-      },
+      ...userProfiles.map(profile => {
+        return {
+          id: profile.id,
+          name: profile.nombre,
+          avatar_url: profile.avatarUrl,
+        };
+      }),
     ],
   });
 };
@@ -79,17 +94,17 @@ export const selectProfileCotroller: Handler = async (req: Request, res: Respons
     throw new Error('Profile could not be selected, req.user was undefined');
   }
 
-  const profileExists = profile_id === '42'; // TODO: agregar logica de la base de datos
-  const profileData = {
-    username: 'juan',
-    id: '42',
-  };
+  const profileData = await prisma.perfil.findFirst({
+    where: {
+      id: profile_id as string,
+    },
+  });
 
-  if (profileExists) {
+  if (profileData) {
     const expires = new Date(Date.now() + (cookiesExpireMinutes * 1000));
     const profileSessionToken = jwt.sign(
       {
-        profile_name: profileData.username,
+        profile_name: profileData.nombre,
         profile_id: profileData.id,
       }, secretKey,
       {
