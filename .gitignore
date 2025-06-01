@@ -1,3 +1,6 @@
+# builded executable
+fonoBackEndServer.*
+
 # dependencies (bun install)
 node_modules
 
