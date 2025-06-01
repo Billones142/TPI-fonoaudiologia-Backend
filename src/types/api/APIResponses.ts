@@ -29,5 +29,13 @@ interface CheckGameResult_Ok extends APIResponse_Ok {
   object_name: string,
 }
 
+interface GetSceneResponse_Ok extends APIResponse_Ok {
+  scene_data: {
+    id: string,
+    name: string, // TODO: agregar mas datos?
+  },
+}
+
 export type GetGamesResponse = GetGamesResponse_Ok | APIResponse_Error;
-export type CheckGameResult = CheckGameResult_Ok | APIResponse_Error; // TODO
+export type CheckGameResult = CheckGameResult_Ok | APIResponse_Error;
+export type GetSceneResponse = GetSceneResponse_Ok | APIResponse_Error;
