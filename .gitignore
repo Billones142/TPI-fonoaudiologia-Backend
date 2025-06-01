@@ -1,3 +1,6 @@
+# builded api tools
+src/openapi/api-fonoaudiologia
+
 # builded executable
 fonoBackEndServer.*
 
