@@ -6,7 +6,16 @@ import { Coordenates, Game, Scene, SceneObject, SceneObjectJWTPayload, SceneObje
 import { Prisma } from '@prisma/client';
 
 export function getShuffledIndexes(array: Array<unknown>): Array<number> {
-  return array.map((_, index) => index).sort(() => Math.random() - 0.5);
+  // Create array of indexes
+  const indexes = array.map((_, index) => index);
+
+  // Fisher-Yates shuffle algorithm
+  for (let i = indexes.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [indexes[i], indexes[j]] = [indexes[j], indexes[i]];
+  }
+
+  return indexes;
 }
 
 export function encriptarSelectorObjeto(objectId: string, sessionId: string, isGameResult: boolean, generationTime: number): string {
