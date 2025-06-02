@@ -46,7 +46,6 @@ CREATE TABLE "ProgresoEscenario" (
     "completado" BOOLEAN NOT NULL DEFAULT false,
     "objetosTotales" INTEGER NOT NULL,
     "objetosReconocidos" INTEGER NOT NULL,
-    "porcentajeReconocido" DOUBLE PRECISION NOT NULL,
     "escenarioId" TEXT NOT NULL,
     "perfilId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -61,6 +60,7 @@ CREATE TABLE "Escenario" (
     "nombre" TEXT NOT NULL,
     "descripcion" TEXT,
     "imagenUrl" TEXT NOT NULL,
+    "logoUrl" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -71,7 +71,7 @@ CREATE TABLE "Escenario" (
 CREATE TABLE "ObjetoEscenario" (
     "id" TEXT NOT NULL,
     "nombre" TEXT NOT NULL,
-    "coordenadas" TEXT NOT NULL,
+    "coordenadas" JSONB NOT NULL,
     "imagenUrl" TEXT NOT NULL,
     "videoSenaUrl" TEXT NOT NULL,
     "escenarioId" TEXT NOT NULL,
@@ -85,7 +85,7 @@ CREATE TABLE "ObjetoEscenario" (
 CREATE TABLE "Juego" (
     "id" TEXT NOT NULL,
     "objetoCorrectoId" TEXT NOT NULL,
-    "objetoSeleccionadoId" TEXT NOT NULL,
+    "objetoSeleccionadoId" TEXT,
     "sesionJuegoId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -108,7 +108,7 @@ CREATE TABLE "JuegoOpcion" (
 CREATE TABLE "SesionJuego" (
     "id" TEXT NOT NULL,
     "inicio" TIMESTAMP(3) NOT NULL,
-    "fin" TIMESTAMP(3) NOT NULL,
+    "fin" TIMESTAMP(3),
     "juegosTotales" INTEGER NOT NULL,
     "aciertos" INTEGER NOT NULL,
     "errores" INTEGER NOT NULL,
@@ -190,7 +190,7 @@ ALTER TABLE "ObjetoEscenario" ADD CONSTRAINT "ObjetoEscenario_escenarioId_fkey" 
 ALTER TABLE "Juego" ADD CONSTRAINT "Juego_objetoCorrectoId_fkey" FOREIGN KEY ("objetoCorrectoId") REFERENCES "ObjetoEscenario"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Juego" ADD CONSTRAINT "Juego_objetoSeleccionadoId_fkey" FOREIGN KEY ("objetoSeleccionadoId") REFERENCES "ObjetoEscenario"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Juego" ADD CONSTRAINT "Juego_objetoSeleccionadoId_fkey" FOREIGN KEY ("objetoSeleccionadoId") REFERENCES "ObjetoEscenario"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Juego" ADD CONSTRAINT "Juego_sesionJuegoId_fkey" FOREIGN KEY ("sesionJuegoId") REFERENCES "SesionJuego"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
