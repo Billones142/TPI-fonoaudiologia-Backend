@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import CryptoJS from 'crypto-js';
 import { prisma } from "../lib/prisma";
 import { gamesSecret } from '../config/env';
-import { Coordenates, Game, Scene, SceneObject, SceneObjectJWTPayload, SceneObjectToSelect } from '../types/models/games';
+import { Game, SceneObjectJWTPayload, SceneObjectToSelect } from '../types/models/games';
 import { Prisma } from '@prisma/client';
 
 export function getShuffledIndexes(array: Array<unknown>): Array<number> {
@@ -161,6 +161,10 @@ export async function procesarRespuestaEnBaseDeDatos(selectionId: string): Promi
   if (!juego) {
     throw new Error('No se encontro el juego al que el selector hace referencia');
   }
+
+  const sesionJuego = prisma.sesionJuego;
+
+  // si se creo hace mas de 2 * cantidad de juegos minutos
 
   await prisma.juego.update({
     where: {
