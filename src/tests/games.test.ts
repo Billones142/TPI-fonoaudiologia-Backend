@@ -45,6 +45,7 @@ beforeAll(async () => {
     data: {
       nombre: 'escenario_games_tests',
       imagenUrl: 'UrlEscenario_test',
+      logoUrl: '',
       objetos: {
         createMany: {
           data: [0, 1, 2, 3, 4, 5].map(index => {

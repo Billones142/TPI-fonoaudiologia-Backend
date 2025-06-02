@@ -103,6 +103,7 @@ model Escenario {
   nombre    String
   descripcion String?
   imagenUrl String
+  logoUrl String
 
   progresosEscenarios ProgresoEscenario[]
 
