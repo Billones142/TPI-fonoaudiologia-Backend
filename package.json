@@ -7,16 +7,18 @@
     "dev": "bun --watch ./src/server.ts",
     "eslint-check": "bunx --bun eslint --ext .ts src",
     "prisma-generate": "bunx --bun prisma generate",
-    "build-deploy-executable": "bun install && bunx --bun prisma generate && bun build --compile --minify --sourcemap --bytecode ./src/server.ts --outfile fonoBackEndServer",
+    "build-deploy-executable": "bun install && bunx --bun prisma generate && bun build --compile --minify --sourcemap ./src/server.ts --outfile fonoBackEndServer",
     "prisma-dev-migrate": "bunx --bun prisma migrate dev"
   },
   "devDependencies": {
+    "@eslint/js": "^8.56.0",
     "@types/bun": "latest",
     "@types/cookie-parser": "^1.4.8",
     "@types/express": "^5.0.1",
     "eslint": "^8.56.0",
     "globals": "^16.2.0",
-    "openapi-typescript-codegen": "^0.29.0"
+    "openapi-typescript-codegen": "^0.29.0",
+    "typescript-eslint": "^7.0.0"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -27,8 +29,6 @@
     "@types/crypto-js": "^4.2.2",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/supertest": "^6.0.3",
-    "@typescript-eslint/eslint-plugin": "^8.32.1",
-    "@typescript-eslint/parser": "^8.32.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "crypto-js": "^4.2.0",
