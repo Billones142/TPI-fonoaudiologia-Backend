@@ -118,7 +118,7 @@ model Escenario {
 model ObjetoEscenario {
   id        String   @id @default(cuid())
   nombre    String
-  coordenadas String
+  coordenadas Json
   imagenUrl String
   videoSenaUrl String
 

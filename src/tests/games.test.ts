@@ -6,6 +6,8 @@ import app from '../app';
 import { prisma } from '../lib/prisma';
 import { Game } from '../types/models/games';
 import { CheckGameResult } from '../types/api/APIResponses';
+import { JsonValue } from '@prisma/client/runtime/library';
+import { Prisma } from '@prisma/client';
 
 let escenarioTestGlobal: {
   id: string;
@@ -20,7 +22,7 @@ let escenarioTestGlobal: {
     updatedAt: Date;
     nombre: string;
     imagenUrl: string;
-    coordenadas: string;
+    coordenadas: JsonValue;
     videoSenaUrl: string;
     escenarioId: string;
   }[],
@@ -48,15 +50,12 @@ beforeAll(async () => {
       logoUrl: '',
       objetos: {
         createMany: {
-          data: [0, 1, 2, 3, 4, 5].map(index => {
-            const timeNow = new Date();
+          data: [0, 1, 2, 3, 4, 5].map<Prisma.ObjetoEscenarioCreateManyEscenarioInput>(index => {
             return {
               nombre: `Objeto_test_${index}`,
-              coordenadas: '[]',
+              coordenadas: [],
               imagenUrl: `Imagen_objeto_test_${index}`,
               videoSenaUrl: `Video_url_objeto_test_${index}`,
-              createdAt: timeNow,
-              updatedAt: timeNow,
             };
           }),
         },
