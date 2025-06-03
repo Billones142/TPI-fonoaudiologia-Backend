@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import CryptoJS from 'crypto-js';
-import { prisma } from "../lib/prisma";
+import { prisma } from '../lib/prisma';
 import { gamesSecret } from '../config/env';
 import { Game, SceneObjectJWTPayload, SceneObjectToSelect } from '../types/models/games';
 import { Prisma } from '@prisma/client';
@@ -164,23 +164,49 @@ export async function generarJuegosAleatorios(sceneId: string, jokerObjectsAmmou
 
 export async function procesarRespuestaEnBaseDeDatos(selectionId: string): Promise<SceneObjectJWTPayload> {
   const objectSelectionIdPayload = desencriptarSelectorObjeto(selectionId);
-
   // TODO: chequear que el id lo envia el mismo usuario y perfil
-  // TODO: agregar una forma para no permitir que puedan enviar varias veces el mismo, encontrar el juego del objeto mediante la sesion de juego
 
   const juego = await prisma.juego.findFirst({
     where: {
       sesionJuegoId: objectSelectionIdPayload.sessionId,
-    }
+    },
   });
 
   if (!juego) {
     throw new Error('No se encontro el juego al que el selector hace referencia');
   }
 
-  const sesionJuego = prisma.sesionJuego;
+  // Check if the game already has an objetoSeleccionadoId
+  if (juego.objetoSeleccionadoId) {
+    throw new Error('Este juego ya tiene un objeto seleccionado');
+  }
 
-  // si se creo hace mas de 2 * cantidad de juegos minutos
+
+  const sesionJuego = await prisma.sesionJuego.findUnique({
+    where: {
+      id: objectSelectionIdPayload.sessionId,
+    },
+    select: {
+      createdAt: true,
+      juegosTotales: true,
+    },
+  });
+
+  if (!sesionJuego) {
+    throw new Error('No se encontro la sesion de juego al que el selector hace referencia');
+  }
+
+  // Calculate the maximum allowed time (2 minutes per game)
+  const maxTimeInMinutes = sesionJuego.juegosTotales * 2;
+  const maxTimeInMs = maxTimeInMinutes * 60 * 1000; // Convert to milliseconds
+
+  // Calculate elapsed time since session creation
+  const elapsedTime = Date.now() - sesionJuego.createdAt.getTime();
+
+  // si se creo hace mas de 2 * cantidad de juegos minuto
+  if (elapsedTime > maxTimeInMs) {
+    throw new Error('Este juego ya supero el maximo tiempo para responder');
+  }
 
   await prisma.juego.update({
     where: {
@@ -198,8 +224,8 @@ export async function procesarRespuestaEnBaseDeDatos(selectionId: string): Promi
       },
       data: {
         aciertos: {
-          increment: 1
-        }
+          increment: 1,
+        },
       },
     });
   } else {
@@ -209,8 +235,8 @@ export async function procesarRespuestaEnBaseDeDatos(selectionId: string): Promi
       },
       data: {
         errores: {
-          increment: 1
-        }
+          increment: 1,
+        },
       },
     });
   }
