@@ -137,7 +137,7 @@ test('generacion de juegos', async () => {
     if (bodyResquestCorrecto.status === 'ok') {
       expect(bodyResquestCorrecto.is_correct).toBe(true);
     } else {
-      expect(false).toBe(true);
+      expect(bodyResquestCorrecto.status).toBe('ok');
     }
     //console.log(JSON.stringify(requestCorrecto, null, 2));
   }

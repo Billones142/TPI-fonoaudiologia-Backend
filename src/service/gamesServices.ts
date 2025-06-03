@@ -80,7 +80,7 @@ export async function generarJuegosAleatorios(sceneId: string, jokerObjectsAmmou
     },
   });
 
-  const shuffledGames: Array<Game> = [];
+  const games: Array<Game> = [];
 
   // For each object in the scene, create a game where it's the correct one
   for (const correctObject of escenario.objetos) {
@@ -124,11 +124,18 @@ export async function generarJuegosAleatorios(sceneId: string, jokerObjectsAmmou
       shuffledObjectsForGame.push(objectsForGame[objectIndex]); // TODO: buscar error donde el primero siempre es el correcto
     });
 
-    shuffledGames.push({
+    games.push({
       videoUrl: principalObject.videoUrl,
       objects: shuffledObjectsForGame,
     });
   }
+
+  const shuffledGames: Array<Game> = [];
+  const shuffledGamesIndexes = getShuffledIndexes(games);
+
+  shuffledGamesIndexes.forEach(gameIndex => {
+    shuffledGames.push(games[gameIndex]);
+  });
 
   // se agregan los juegos creados a la sesion de juego
   await prisma.sesionJuego.update({
@@ -139,7 +146,7 @@ export async function generarJuegosAleatorios(sceneId: string, jokerObjectsAmmou
       juegos: {
         createMany: {
           data: [
-            ...shuffledGames.map<Prisma.JuegoCreateManySesionJuegoInput>(game => {
+            ...games.map<Prisma.JuegoCreateManySesionJuegoInput>(game => {
               const objetoCorrectoId = escenario.objetos.find(objeto => objeto.videoSenaUrl === game.videoUrl)?.id as string;
               return {
                 objetoCorrectoId: objetoCorrectoId,
