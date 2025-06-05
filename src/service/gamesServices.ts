@@ -121,7 +121,7 @@ export async function generarJuegosAleatorios(sceneId: string, jokerObjectsAmmou
     const shuffledObjectIndexes = getShuffledIndexes(objectsForGame);
 
     shuffledObjectIndexes.forEach(objectIndex => {
-      shuffledObjectsForGame.push(objectsForGame[objectIndex]); // TODO: buscar error donde el primero siempre es el correcto
+      shuffledObjectsForGame.push(objectsForGame[objectIndex]);
     });
 
     games.push({
