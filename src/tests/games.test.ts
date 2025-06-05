@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import request from 'supertest';
-import { describe, test, expect, beforeAll, afterEach, afterAll } from '@jest/globals';
+import { describe, test, expect, beforeAll, afterAll } from '@jest/globals';
 
 import app from '../app';
 import { prisma } from '../lib/prisma';
