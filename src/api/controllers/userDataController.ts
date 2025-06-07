@@ -1,52 +1,9 @@
 import jwt from 'jsonwebtoken';
 import { Handler, Request, Response } from 'express';
 import { secretKey } from '../../config/env';
-import { User } from '../../types/models/User';
 import { prisma } from '../../lib/prisma';
-import { verifyUser } from '../../service/userServices';
-import { userLoggedCheckMiddleware } from '../middlewares/checkLogged';
 
 const cookiesExpireMinutes = 60 * 60;
-
-
-/**
- * Recieves a username and password as a URL encoded form an returns a session cookie if they are valid
- * @method POST
- * @param req 
- * @param res 
- */
-export const loginController: Handler = async (req: Request, res: Response) => {
-  // TODO: agregar rol del usuario al payload del JWT, agregar conexion a base de datos
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const { email, password } = req.body;
-
-  if (typeof email !== 'string' || typeof password !== 'string') {
-    console.error('Invalid credentials:', email, password);
-    res.status(401)
-      .json({ message: 'not valid username or password' });
-    return;
-  }
-
-  const verified = await verifyUser(email, password);
-
-  if (!verified) {
-    res.status(401)
-      .json({ message: 'Invalid credentials' });
-    return;
-  }
-
-
-  const expires = new Date(Date.now() + (cookiesExpireMinutes * 1000)); // 60 minutos
-  const payloadData: User = {
-    name: verified.name,
-    id: verified.id,
-    email: verified.email,
-  };
-  const generatedToken = jwt.sign(payloadData, secretKey, { expiresIn: cookiesExpireMinutes });
-
-  res.cookie('sessionid', generatedToken, { secure: false, httpOnly: true, expires: expires });
-  res.status(200).json({ message: 'Login successful' });
-};
 
 /**
  * user has to be logged in, so it will return the user profiles that the account has
@@ -54,7 +11,7 @@ export const loginController: Handler = async (req: Request, res: Response) => {
  * @param req 
  * @param res 
  */
-export const getUserProfilesController: Handler = async (req: Request, res: Response) => { //TODO: completar con logica de la base de datos
+export const getUserProfilesController: Handler = async (req: Request, res: Response) => {
   const userProfiles = await prisma.perfil.findMany({
     where: {
       usuarioId: req.user?.id,
