@@ -3,6 +3,8 @@ import cors from "cors";
 import apiRoutes from "./api/index";
 
 const app = express();
+app.use(express.json());
+
 app.use(
   cors({
     credentials: true,
