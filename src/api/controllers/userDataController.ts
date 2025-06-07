@@ -38,8 +38,9 @@ export const loginController: Handler = async (req: Request, res: Response) => {
 
   const expires = new Date(Date.now() + (cookiesExpireMinutes * 1000)); // 60 minutos
   const payloadData: User = {
-    username: verified.name,
-    userId: verified.id,
+    name: verified.name,
+    id: verified.id,
+    email: verified.email,
   };
   const generatedToken = jwt.sign(payloadData, secretKey, { expiresIn: cookiesExpireMinutes });
 
@@ -56,7 +57,7 @@ export const loginController: Handler = async (req: Request, res: Response) => {
 export const getUserProfilesController: Handler = async (req: Request, res: Response) => { //TODO: completar con logica de la base de datos
   const userProfiles = await prisma.perfil.findMany({
     where: {
-      usuarioId: req.user?.userId,
+      usuarioId: req.user?.id,
     },
   });
   res.json({
@@ -94,7 +95,7 @@ export const selectProfileController: Handler = async (req: Request, res: Respon
   const profileData = await prisma.perfil.findFirst({
     where: {
       id: profile_id,
-      usuarioId: req.user.userId,
+      usuarioId: req.user.id,
     },
   });
 

@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { Request, Response, NextFunction, Handler } from 'express';
 import { SUPABASE_SERVICE_ROLE_KEY, SUPABASE_URL } from '../../config/env';
 import { User } from '../../types/models/User';
@@ -47,7 +45,7 @@ export const userLoggedCheckMiddleware: Handler = async (req: Request, res: Resp
     const appUser: User = {
       id: user.id,
       email: user.email || '',
-      name: user.user_metadata?.username || '',
+      name: user.user_metadata?.username as string || '',
     };
 
     req.user = appUser;
