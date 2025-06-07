@@ -1,5 +1,5 @@
 import { Router, urlencoded } from 'express';
-import { getUserProfilesController, loginController, selectProfileController } from '../controllers/userDataController';
+import { getUserProfilesController, selectProfileController } from '../controllers/userDataController';
 import { userLoggedCheckMiddleware } from '../middlewares/checkLogged';
 
 const router = Router();
@@ -14,7 +14,6 @@ router.use(
   }),
 );
 
-router.post('/login', loginController);
 
 router.get('/getProfiles', userLoggedCheckMiddleware, getUserProfilesController);
 
