@@ -1,14 +1,25 @@
 import { Router, urlencoded } from 'express';
-import { loginController } from '../controllers/userDataController';
+import { getUserProfilesController, selectProfileController } from '../controllers/userDataController';
+import { userLoggedCheckMiddleware } from '../middlewares/checkLogged';
 
 const router = Router();
 
-router.post('/login', urlencoded({
-  extended: true,
-  inflate: true,
-  limit: '1mb',
-  parameterLimit: 2, // user and password
-  type: 'application/x-www-form-urlencoded',
-}), loginController);
+router.use(
+  urlencoded({
+    extended: true,
+    inflate: true,
+    limit: '1mb',
+    parameterLimit: 2, // user and password
+    type: 'application/x-www-form-urlencoded',
+  }),
+);
+
+
+router.get('/getProfiles', userLoggedCheckMiddleware, getUserProfilesController);
+
+router.post('/selectProfile',
+  userLoggedCheckMiddleware,
+  selectProfileController,
+);
 
 export default router;
