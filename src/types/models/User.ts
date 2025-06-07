@@ -1,6 +1,7 @@
 export interface User {
-  username: string,
-  userId: string,
+  name: string,
+  id: string,
+  email: string,
 }
 
 export interface Profile {
