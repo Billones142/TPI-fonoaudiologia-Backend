@@ -1,6 +1,5 @@
-import app from './app';
-import { PORT } from './config/env';
-
+import app from "./app";
+import { PORT } from "./config/env";
 
 app.listen(PORT, () => {
   console.log(`started on port ${PORT}`);
