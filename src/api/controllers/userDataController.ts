@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { Handler, Request, Response } from 'express';
+import { Request, Response, RequestHandler } from 'express';
 import { secretKey } from '../../config/env';
 import { prisma } from '../../lib/prisma';
 
@@ -11,7 +11,7 @@ const cookiesExpireMinutes = 60 * 60;
  * @param req 
  * @param res 
  */
-export const getUserProfilesController: Handler = async (req: Request, res: Response) => {
+export const getUserProfilesController: RequestHandler = async (req: Request, res: Response) => {
   const userProfiles = await prisma.perfil.findMany({
     where: {
       usuarioId: req.user?.id,
@@ -36,8 +36,7 @@ export const getUserProfilesController: Handler = async (req: Request, res: Resp
  * @param req should include the id of the profile as urlencode form
  * @param res 
  */
-export const selectProfileController: Handler = async (req: Request, res: Response) => { //TODO
-  // JWT should include username and profile name, JWT should expire in 2hs?
+export const selectProfileController: RequestHandler = async (req: Request, res: Response) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const { profile_id } = req.body;
 
@@ -82,7 +81,7 @@ export const selectProfileController: Handler = async (req: Request, res: Respon
  * @param req 
  * @param res 
  */
-export const editProfileController: Handler = async (req: Request, res: Response) => { // TODO
+export const editProfileController: RequestHandler = async (req: Request, res: Response) => { // TODO
 
 };
 
@@ -91,6 +90,6 @@ export const editProfileController: Handler = async (req: Request, res: Response
  * @param req 
  * @param res 
  */
-export const deleteProfileController: Handler = async (req: Request, res: Response) => { // TODO
+export const deleteProfileController: RequestHandler = async (req: Request, res: Response) => { // TODO
 
 };

@@ -1,8 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { describe, test, expect, mock, beforeAll, beforeEach } from 'bun:test';
+import { describe, test, expect, mock, beforeEach } from 'bun:test';
 import { userLoggedCheckMiddleware } from '../api/middlewares/checkLogged';
-import { createClient } from '@supabase/supabase-js';
-import { User } from '../types/models/User';
 
 // Mock Supabase client
 const mockCreateClient = mock(() => ({}));
@@ -33,8 +31,8 @@ describe('userLoggedCheckMiddleware', () => {
       headers: {},
       cookies: {},
     };
-    const statusMock = mock((code: number) => mockResponse as Response);
-    const jsonMock = mock((data: any) => mockResponse as Response);
+    const statusMock = mock(() => mockResponse as Response);
+    const jsonMock = mock(() => mockResponse as Response);
     mockResponse = {
       status: statusMock as unknown as Response['status'],
       json: jsonMock as unknown as Response['json'],
