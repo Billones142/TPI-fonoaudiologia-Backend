@@ -1,6 +1,7 @@
-import { json, Router, urlencoded } from 'express';
+import { json, Router } from 'express';
 import { getUserProfilesController, selectProfileController } from '../controllers/userDataController';
 import { userLoggedCheckMiddleware } from '../middlewares/checkLogged';
+import progressRoutes from './progressRoutes';
 
 const router = Router();
 
@@ -16,5 +17,7 @@ router.post('/selectProfile',
   userLoggedCheckMiddleware,
   selectProfileController,
 );
+
+router.use('/progress', progressRoutes);
 
 export default router;
