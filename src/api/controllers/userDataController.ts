@@ -14,7 +14,9 @@ const cookiesExpireMinutes = 60 * 60;
 export const getUserProfilesController: RequestHandler = async (req: Request, res: Response) => {
   const userProfiles = await prisma.perfil.findMany({
     where: {
-      usuarioId: req.user?.id,
+      usuario: {
+        authUserId: req.user?.id,
+      },
     },
   });
   res.json({

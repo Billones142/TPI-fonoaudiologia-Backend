@@ -181,37 +181,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /user/login:
-    post:
-      tags:
-        - Authentication
-      summary: Inicia sesión de usuario
-      requestBody:
-        required: true
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/LoginRequest'
-      responses:
-        '200':
-          description: Login exitoso
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LoginResponse'
-          headers:
-            Set-Cookie:
-              schema:
-                type: string
-                example: sessionid=abc123; HttpOnly
-        '401':
-          description: Credenciales inválidas
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
-  /user/profiles:
+  /user/getProfiles:
     get:
       tags:
         - User
