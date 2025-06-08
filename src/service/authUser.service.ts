@@ -28,3 +28,16 @@ export const obtenerMedicos = async (): Promise<
     },
   });
 };
+
+export const obtenerUsuarioPorAuthUserId = async (
+  authUserId: string
+): Promise<Usuario | null> => {
+  return await prisma.usuario.findUnique({
+    where: { authUserId },
+    include: {
+      pacientes: true,
+      medico: true,
+      perfiles: true,
+    },
+  });
+};
