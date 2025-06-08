@@ -12,7 +12,7 @@ router.use('/user', userDataRoutes);
 // cookie protected routes
 router.use('/games', userLoggedCheckMiddleware, gameRoutes);
 
-router.use('/scenes', userLoggedCheckMiddleware, scenesRoutes);
+router.use('/scenes', scenesRoutes);
 
 router.use('/objects', userLoggedCheckMiddleware, objectsRoutes);
 
