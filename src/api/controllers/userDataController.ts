@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import { Request, Response, RequestHandler } from 'express';
 import { secretKey } from '../../config/env';
 import { prisma } from '../../lib/prisma';
+import { Profile } from '../../types/models/User';
 
 const cookiesExpireMinutes = 60 * 60;
 
@@ -14,7 +15,9 @@ const cookiesExpireMinutes = 60 * 60;
 export const getUserProfilesController: RequestHandler = async (req: Request, res: Response) => {
   const userProfiles = await prisma.perfil.findMany({
     where: {
-      usuarioId: req.user?.id,
+      usuario: {
+        authUserId: req.user?.id,
+      },
     },
   });
   res.json({
@@ -51,17 +54,21 @@ export const selectProfileController: RequestHandler = async (req: Request, res:
   const profileData = await prisma.perfil.findFirst({
     where: {
       id: profile_id,
-      usuarioId: req.user.id,
+      usuario: {
+        authUserId: req.user.id,
+      },
     },
   });
 
   if (profileData) {
     const expires = new Date(Date.now() + (cookiesExpireMinutes * 1000));
+    const payload: Profile = {
+      id: profileData.id,
+      name: profileData.nombre,
+    };
     const profileSessionToken = jwt.sign(
-      {
-        profile_name: profileData.nombre,
-        profile_id: profileData.id,
-      }, secretKey,
+      payload,
+      secretKey,
       {
         expiresIn: cookiesExpireMinutes, // 1 hour in seconds
       });

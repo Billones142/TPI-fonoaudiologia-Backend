@@ -1,21 +1,16 @@
-import { Router, urlencoded } from 'express';
+import { json, Router, urlencoded } from 'express';
 import { getUserProfilesController, selectProfileController } from '../controllers/userDataController';
 import { userLoggedCheckMiddleware } from '../middlewares/checkLogged';
 
 const router = Router();
 
-router.use(
-  urlencoded({
-    extended: true,
-    inflate: true,
-    limit: '1mb',
-    parameterLimit: 2, // user and password
-    type: 'application/x-www-form-urlencoded',
-  }),
+// Middleware para parsear JSON debe ir antes de las rutas
+router.use(json());
+
+router.get('/getProfiles',
+  userLoggedCheckMiddleware,
+  getUserProfilesController,
 );
-
-
-router.get('/getProfiles', userLoggedCheckMiddleware, getUserProfilesController);
 
 router.post('/selectProfile',
   userLoggedCheckMiddleware,

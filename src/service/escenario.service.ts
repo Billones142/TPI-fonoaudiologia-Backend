@@ -1,8 +1,8 @@
-import { prisma } from "../config/prismaSingleton";
-import { Escenario, Prisma } from "@prisma/client";
+import { prisma } from '../config/prismaSingleton';
+import { Escenario, Prisma } from '@prisma/client';
 
 export const crearEscenario = async (
-  data: Prisma.EscenarioCreateInput
+  data: Prisma.EscenarioCreateInput,
 ): Promise<Escenario> => {
   return await prisma.escenario.create({
     data,
@@ -10,7 +10,7 @@ export const crearEscenario = async (
 };
 
 export const obtenerEscenarioPorId = async (
-  id: string
+  id: string,
 ): Promise<Escenario | null> => {
   return await prisma.escenario.findUnique({
     where: { id },
@@ -21,9 +21,5 @@ export const obtenerEscenarioPorId = async (
 };
 
 export const obtenerEscenarios = async (): Promise<Escenario[]> => {
-  return await prisma.escenario.findMany({
-    include: {
-      objetos: true,
-    },
-  });
+  return await prisma.escenario.findMany();
 };

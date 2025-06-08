@@ -15,8 +15,8 @@ router.use("/auth", authUserRoutes);
 // cookie protected routes
 router.use("/games", userLoggedCheckMiddleware, gameRoutes);
 
-router.use("/scenes", userLoggedCheckMiddleware, scenesRoutes);
+router.use("/scenes", scenesRoutes);
 
-router.use("/objects", userLoggedCheckMiddleware, objectsRoutes);
+router.use("/objects", objectsRoutes);
 
 export default router;
