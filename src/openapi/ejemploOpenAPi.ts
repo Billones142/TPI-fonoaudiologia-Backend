@@ -45,19 +45,17 @@ async function main(): Promise<void> {
     }
 
     // Hacer la llamada a la API
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-    const perfiles = await UserService.getUserGetProfiles();
+    const perfiles = await UserService.getUserProfiles();
     console.log('Perfiles obtenidos:', JSON.stringify(perfiles, null, 2));
 
     // Seleccionar perfil
     const primerPerfil = perfiles.profiles[0];
-    await UserService.postUserSelectProfile({ requestBody: { profile_id: primerPerfil.id as string } });
+    await UserService.selectUserProfile({ requestBody: { profile_id: primerPerfil.id } });
     console.log('Cookies después de seleccionar perfil:', document.cookie);
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     const escenarios = await ScenesService.getScenes();
-    //console.log(JSON.stringify(escenarios, null, 2));
-    const games = await GamesService.getGames({ sceneId: escenarios[0].id });
+    const escenarioId = escenarios[0].id;
+    const games = await GamesService.getGames({ sceneId: escenarioId });
 
     console.log(games);
   } catch (error) {

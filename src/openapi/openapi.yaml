@@ -1,4 +1,4 @@
-openapi: 3.1.0
+openapi: 3.0.4
 info:
   title: Fonoaudiología Backend API
   version: 0.0.1
@@ -32,6 +32,38 @@ components:
           type: array
           items:
             type: string
+    
+    SceneObject:
+      type: object
+      required:
+        - id
+        - name
+        - imageUrl
+        - videoUrl
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        verticesLocation:
+          type: array
+          items:
+            type: array
+            items:
+              type: number
+        imageUrl:
+          type: string
+        videoUrl:
+          type: string
+        selectionId:
+          type: string
+
+    GameObject:
+      allOf:
+        - $ref: "#/components/schemas/SceneObject"
+        - type: object
+          required:
+            - selectionId
 
     Game:
       type: object
@@ -41,22 +73,7 @@ components:
         objects:
           type: array
           items:
-            type: object
-            properties:
-              name:
-                type: string
-              verticesLocation:
-                type: array
-                items:
-                  type: array
-                  items:
-                    type: number
-              imageUrl:
-                type: string
-              videoUrl:
-                type: string
-              selectionId:
-                type: string
+            $ref: "#/components/schemas/GameObject"
 
     GetGamesResponse:
       type: object
@@ -90,15 +107,7 @@ components:
           items:
             type: string
 
-    LoginRequest:
-      type: object
-      properties:
-        user:
-          type: string
-        password:
-          type: string
-
-    LoginResponse:
+    SelectProfileResponse:
       type: object
       properties:
         message:
@@ -106,6 +115,10 @@ components:
 
     Profile:
       type: object
+      required:
+        - id
+        - name
+        - avatar_url
       properties:
         id:
           type: string
@@ -126,6 +139,14 @@ components:
 
     Scene:
       type: object
+      required:
+        - id
+        - nombre
+        - descripcion
+        - imagenUrl
+        - logoUrl
+        - createdAt
+        - updatedAt
       properties:
         id:
           type: string
@@ -183,6 +204,7 @@ components:
 paths:
   /games/{sceneId}:
     get:
+      operationId: getGames
       tags:
         - Games
       summary: Obtiene los juegos para un escenario específico
@@ -210,6 +232,7 @@ paths:
 
   /games/submitSelection/{selectionId}:
     post:
+      operationId: submitSelection
       tags:
         - Games
       summary: Verifica si la selección del usuario es correcta
@@ -237,6 +260,7 @@ paths:
 
   /user/getProfiles:
     get:
+      operationId: getUserProfiles
       tags:
         - User
       summary: Obtiene los perfiles del usuario
@@ -252,6 +276,7 @@ paths:
 
   /user/selectProfile:
     post:
+      operationId: selectUserProfile
       tags:
         - User
       summary: Selecciona un perfil de usuario
@@ -274,7 +299,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LoginResponse'
+                $ref: '#/components/schemas/SelectProfileResponse'
           headers:
             Set-Cookie:
               schema:
@@ -287,8 +312,43 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /scenes/{id}:
+    get:
+      operationId: getScene
+      tags:
+        - Scenes
+      summary: Obtiene un escenario específico
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Escenario obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Scene'
+        '404':
+          description: Escenario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
   /scenes:
     get:
+      operationId: getScenes
       tags:
         - Scenes
       summary: Obtiene todos los escenarios
@@ -339,11 +399,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /scenes/{id}:
+  /objects/{id}:
     get:
       tags:
-        - Scenes
-      summary: Obtiene un escenario específico
+        - Objects
+      summary: Obtiene un objeto de escenario específico
       security:
         - bearerAuth: []
       parameters:
@@ -354,20 +414,53 @@ paths:
             type: string
       responses:
         '200':
-          description: Escenario obtenido exitosamente
+          description: Objeto de escenario obtenido exitosamente
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Scene'
-        '404':
-          description: Escenario no encontrado
+                $ref: '#/components/schemas/SceneObject'
+        '400':
+          description: ID no proporcionado
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '401':
-          description: No autorizado
+        '404':
+          description: Objeto de escenario no encontrado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error' 
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /objects:
+    post:
+      tags:
+        - Objects
+      summary: Crea un nuevo objeto de escenario
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SceneObject'
+      responses:
+        '201':
+          description: Objeto de escenario creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SceneObject'
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
