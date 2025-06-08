@@ -201,6 +201,64 @@ components:
           items:
             type: string
 
+    ProgresedScene:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+
+    GameSession:
+      type: object
+      required:
+        - intento
+        - aciertos
+        - totalPreguntas
+        - tiempoCompletado
+      properties:
+        intento:
+          type: integer
+        aciertos:
+          type: integer
+        totalPreguntas:
+          type: integer
+        tiempoCompletado:
+          type: integer
+
+    GetProgressedScenesResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ok, error]
+        scenes_with_progress:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProgresedScene'
+        error:
+          type: array
+          items:
+            type: string
+
+    GetSceneProgressResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ok, error]
+        scenes_game_sessions:
+          type: array
+          items:
+            $ref: '#/components/schemas/GameSession'
+        error:
+          type: array
+          items:
+            type: string
+
 paths:
   /games/{sceneId}:
     get:
@@ -273,6 +331,68 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GetProfilesResponse'
+
+  /user/progress/getProgressedScenes:
+    get:
+      operationId: getProgressedScenes
+      tags:
+        - Progress
+      summary: Obtiene los escenarios con progreso del perfil actual
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Escenarios con progreso obtenidos exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetProgressedScenesResponse'
+        '401':
+          description: No autorizado - Perfil no seleccionado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /user/progress/{sceneId}:
+    get:
+      operationId: getSceneProgress
+      tags:
+        - Progress
+      summary: Obtiene el progreso de un escenario específico
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: sceneId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Progreso del escenario obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetSceneProgressResponse'
+        '400':
+          description: ID de escena no proporcionado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No autorizado - Perfil no seleccionado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /user/selectProfile:
     post:
