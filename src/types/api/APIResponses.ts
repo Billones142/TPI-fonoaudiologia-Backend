@@ -19,15 +19,16 @@ interface GetGamesResponse_Ok extends APIResponse_Ok {
   games_data: ArrayLike<Game>;
 }
 
-interface GetGamesResponse_Fail extends APIResponse_Error { // TODO: ver si es necesario tener esta interfaz
-  name: unknown,
-}
-
 interface CheckGameResult_Ok extends APIResponse_Ok {
   is_correct: boolean,
   game_session_id: string,
   object_id: string,
 }
 
+interface GetProgressedScenesResponse_Ok extends APIResponse_Ok {
+  scenesWithProgress: ArrayLike<>; //TODO
+}
+
+export type GetProgressedScenesResponse = GetProgressedScenesResponse_Ok | APIResponse_Error;
 export type GetGamesResponse = GetGamesResponse_Ok | APIResponse_Error;
-export type CheckGameResult = CheckGameResult_Ok | APIResponse_Error; // TODO
+export type CheckGameResult = CheckGameResult_Ok | APIResponse_Error;
