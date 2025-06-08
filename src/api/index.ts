@@ -14,6 +14,6 @@ router.use('/games', userLoggedCheckMiddleware, gameRoutes);
 
 router.use('/scenes', scenesRoutes);
 
-router.use('/objects', userLoggedCheckMiddleware, objectsRoutes);
+router.use('/objects', objectsRoutes);
 
 export default router;
