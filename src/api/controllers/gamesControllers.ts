@@ -15,8 +15,10 @@ export const getGames: Handler = async (req: Request, res: Response) => {
   let apiResponse: GetGamesResponse;
 
   try {
-    const perfil = await prisma.perfil.findMany(); // TODO: solo para tests
-    const juegos = await generarJuegosAleatorios(sceneId, 2, perfil[0].id); // TODO: Check profile id
+    if (!req.profile) {
+      throw new Error('User profile not selected');
+    }
+    const juegos = await generarJuegosAleatorios(sceneId, 2, req.profile.id);
 
     apiResponse = {
       status: 'ok',

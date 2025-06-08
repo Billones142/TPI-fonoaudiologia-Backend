@@ -1,7 +1,7 @@
 /**
  * A este juego le faltaria la logica del login para obtener las cookies, ya que en un futuro para generar el juego si o si se van a necesitar
  */
-import { OpenAPI, UserService } from './api-fonoaudiologia';
+import { GamesService, OpenAPI, ScenesService, UserService } from './api-fonoaudiologia';
 import { createClient, Session } from '@supabase/supabase-js';
 
 // Estos datos vienen desde tu panel de Supabase
@@ -44,12 +44,22 @@ async function main(): Promise<void> {
       throw new Error('No se pudo obtener el token de acceso');
     }
 
-    //updateAuthHeaders(signInData.data.session);
-
-
     // Hacer la llamada a la API
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
     const perfiles = await UserService.getUserGetProfiles();
     console.log('Perfiles obtenidos:', JSON.stringify(perfiles, null, 2));
+
+    // Seleccionar perfil
+    const primerPerfil = perfiles.profiles[0];
+    await UserService.postUserSelectProfile({ requestBody: { profile_id: primerPerfil.id as string } });
+    console.log('Cookies después de seleccionar perfil:', document.cookie);
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    const escenarios = await ScenesService.getScenes();
+    //console.log(JSON.stringify(escenarios, null, 2));
+    const games = await GamesService.getGames({ sceneId: escenarios[0].id });
+
+    console.log(games);
   } catch (error) {
     console.error('Error:', error);
   }

@@ -16,10 +16,6 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-    sessionCookie:
-      type: apiKey
-      in: cookie
-      name: sessionid
     profileCookie:
       type: apiKey
       in: cookie
@@ -120,11 +116,69 @@ components:
 
     GetProfilesResponse:
       type: object
+      required:
+        - profiles
       properties:
         profiles:
           type: array
           items:
             $ref: '#/components/schemas/Profile'
+
+    Scene:
+      type: object
+      properties:
+        id:
+          type: string
+        nombre:
+          type: string
+        descripcion:
+          type: string
+          nullable: true
+        imagenUrl:
+          type: string
+        logoUrl:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    GetScenesResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/Scene'
+
+    CreateSceneRequest:
+      type: object
+      properties:
+        nombre:
+          type: string
+        descripcion:
+          type: string
+          nullable: true
+        imagenUrl:
+          type: string
+        logoUrl:
+          type: string
+      required:
+        - nombre
+        - imagenUrl
+        - logoUrl
+
+    CreateSceneResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ok, error]
+        scene:
+          $ref: '#/components/schemas/Scene'
+        error:
+          type: array
+          items:
+            type: string
 
 paths:
   /games/{sceneId}:
@@ -203,12 +257,17 @@ paths:
       summary: Selecciona un perfil de usuario
       security:
         - bearerAuth: []
-      parameters:
-        - name: profile_id
-          in: query
-          required: true
-          schema:
-            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                profile_id:
+                  type: string
+              required:
+                - profile_id
       responses:
         '200':
           description: Perfil seleccionado exitosamente
@@ -223,6 +282,91 @@ paths:
                 example: profilesession=xyz789; HttpOnly
         '404':
           description: Perfil no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /scenes:
+    get:
+      tags:
+        - Scenes
+      summary: Obtiene todos los escenarios
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de escenarios obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetScenesResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - Scenes
+      summary: Crea un nuevo escenario
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSceneRequest'
+      responses:
+        '201':
+          description: Escenario creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateSceneResponse'
+        '400':
+          description: Datos inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /scenes/{id}:
+    get:
+      tags:
+        - Scenes
+      summary: Obtiene un escenario específico
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Escenario obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Scene'
+        '404':
+          description: Escenario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No autorizado
           content:
             application/json:
               schema:

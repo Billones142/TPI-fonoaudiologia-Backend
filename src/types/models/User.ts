@@ -6,6 +6,6 @@ export interface User {
 
 export interface Profile {
   /** can be selected by the user */
-  profileName?: string,
-  profileId?: string,
+  name: string,
+  id: string,
 }

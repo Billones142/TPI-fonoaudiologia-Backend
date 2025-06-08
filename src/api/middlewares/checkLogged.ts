@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction, Handler } from 'express';
-import { SUPABASE_SERVICE_ROLE_KEY, SUPABASE_URL } from '../../config/env';
-import { User } from '../../types/models/User';
+import { secretKey, SUPABASE_SERVICE_ROLE_KEY, SUPABASE_URL } from '../../config/env';
+import { Profile, User } from '../../types/models/User';
 import { createClient } from '@supabase/supabase-js';
+import jwt from 'jsonwebtoken';
 
 //export interface AuthenticatedRequest extends Request {
 //  user?: {
@@ -18,7 +19,8 @@ import { createClient } from '@supabase/supabase-js';
  */
 export const userLoggedCheckMiddleware: Handler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { authorization } = req.headers;
-  const { profile_token } = req.cookies; // TODO
+  const { profile_token } = req.cookies;
+
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
     res.status(403).json({
@@ -30,6 +32,14 @@ export const userLoggedCheckMiddleware: Handler = async (req: Request, res: Resp
   const token = authorization.split(' ')[1];
 
   try {
+    if (typeof profile_token === 'string') {
+      try {
+        const data = jwt.verify(profile_token, secretKey) as Profile;
+        req.profile = data;
+      } catch (error) {
+        throw new Error('Profile token was invalid');
+      }
+    }
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
     const { data: { user }, error } = await supabase.auth.getUser(token);
