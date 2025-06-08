@@ -1,4 +1,5 @@
 import { Game } from '../models/games';
+import { GameSession, ProgresedScene } from '../models/Progress';
 
 interface APIResponse {
   status: 'ok' | 'error',
@@ -26,9 +27,14 @@ interface CheckGameResult_Ok extends APIResponse_Ok {
 }
 
 interface GetProgressedScenesResponse_Ok extends APIResponse_Ok {
-  scenesWithProgress: ArrayLike<>; //TODO
+  scenes_with_progress: ArrayLike<ProgresedScene>;
 }
 
+interface GetSceneProgressResponse_Ok extends APIResponse_Ok {
+  scenes_game_sessions: ArrayLike<GameSession>,
+}
+
+export type GetSceneProgressResponse = GetSceneProgressResponse_Ok | APIResponse_Error;
 export type GetProgressedScenesResponse = GetProgressedScenesResponse_Ok | APIResponse_Error;
 export type GetGamesResponse = GetGamesResponse_Ok | APIResponse_Error;
 export type CheckGameResult = CheckGameResult_Ok | APIResponse_Error;

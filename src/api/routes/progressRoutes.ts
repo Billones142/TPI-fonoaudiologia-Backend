@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { getProgressedScenes, getSceneProgressController } from '../controllers/progressControllers';
+import { getProgressedScenesController, getSceneProgressController } from '../controllers/progressControllers';
 
 const router = Router();
 
 router.use();
 
-router.get('/getProgressedScenes', getProgressedScenes);
+router.get('/getProgressedScenes', getProgressedScenesController);
 router.get('/:sceneId', getSceneProgressController);
 
 export default router;
