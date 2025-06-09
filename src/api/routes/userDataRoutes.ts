@@ -18,6 +18,6 @@ router.post('/selectProfile',
   selectProfileController,
 );
 
-router.use('/progress', progressRoutes);
+router.use('/progress', userLoggedCheckMiddleware, progressRoutes);
 
 export default router;
