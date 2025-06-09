@@ -49,6 +49,7 @@ export const userLoggedCheckMiddleware: Handler = async (
     } = await supabase.auth.getUser(token);
 
     if (error || !user) {
+      console.error('Error de verificacion de usuario', user, error);
       res.status(403).json({
         message: "Invalid or expired token",
       });
