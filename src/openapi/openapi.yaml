@@ -431,7 +431,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /editProfile/{profileId}:
+  /perfiles/editProfile/{profileId}:
     put:
       operationId: editUserProfile
       tags:
@@ -478,7 +478,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /deleteProfile/{profileId}:
+  /perfiles/deleteProfile/{profileId}:
     delete:
       operationId: deleteUserProfile
       tags:
@@ -505,6 +505,47 @@ paths:
                     example: "Profile deleted successfully"
         '404':
           description: Perfil no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /perfiles/:
+    post:
+      operationId: createUserProfile
+      tags:
+        - User
+      summary: Crea un nuevo perfil de usuario
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                avatar_url:
+                  type: string
+              required:
+                - name
+      responses:
+        '201':
+          description: Perfil creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+        '400':
+          description: Datos inválidos
           content:
             application/json:
               schema:
