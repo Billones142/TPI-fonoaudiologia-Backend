@@ -26,7 +26,7 @@ export const getGames: Handler = async (req: Request, res: Response) => {
     };
   } catch (error) {
     if (error instanceof Error) {
-      console.error(`escena con id ${sceneId} no encontrado`);
+      console.error(`escena con id ${sceneId} no encontrado`, error);
       apiResponse = {
         status: 'error',
         error: ['game not found', error.message],
