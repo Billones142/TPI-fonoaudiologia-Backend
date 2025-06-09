@@ -9,7 +9,7 @@ import { createClient } from "@supabase/supabase-js";
 import jwt from "jsonwebtoken";
 
 /**
- * requires to have the bodyparser with urlencoded to work
+ * 
  * @description checks that the user is logged in and adds the data from this user to the request
  * @param req
  * @param res
@@ -39,6 +39,7 @@ export const userLoggedCheckMiddleware: Handler = async (
       try {
         const data = jwt.verify(profilesession.split(' ')[1], secretKey) as Profile;
         req.profile = data;
+        console.log('datos de perfil', data);
       } catch (error) {
         throw new Error("Profile token was invalid");
       }
