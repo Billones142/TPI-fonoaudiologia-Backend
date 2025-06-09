@@ -721,3 +721,145 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  
+  /auth/medicos:
+    get:
+      operationId: getMedicos
+      tags:
+        - Auth
+      summary: Obtiene la lista de médicos registrados
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de médicos obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  medicos:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        nombre:
+                          type: string
+                        email:
+                          type: string
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/:
+    post:
+      operationId: createAuthUser
+      tags:
+        - Auth
+      summary: Crea un nuevo usuario de autenticación
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                rol:
+                  type: string
+                medicoId:
+                  type: string
+              required:
+                - name
+                - rol
+                - medicoId
+      responses:
+        '201':
+          description: Usuario creado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      email:
+                        type: string
+                      nombre:
+                        type: string
+        '400':
+          description: Datos inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/{authUserId}:
+    get:
+      operationId: getAuthUser
+      tags:
+        - Auth
+      summary: Obtiene información de un usuario específico
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: authUserId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Usuario obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      email:
+                        type: string
+                      nombre:
+                        type: string
+        '404':
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
