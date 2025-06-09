@@ -68,6 +68,8 @@ components:
 
     Game:
       type: object
+      required:
+        - objects
       properties:
         videoUrl:
           type: string
@@ -78,6 +80,9 @@ components:
 
     GetGamesResponse:
       type: object
+      required:
+        - status
+        - games_data
       properties:
         status:
           type: string
@@ -93,6 +98,11 @@ components:
 
     CheckGameResult:
       type: object
+      required:
+        - status
+        - games_data
+        - is_correct
+        - object_name
       properties:
         status:
           type: string
@@ -533,10 +543,11 @@ paths:
               properties:
                 name:
                   type: string
-                avatar_url:
+                avatarUrl:
                   type: string
               required:
                 - name
+                - avatarUrl
       responses:
         '201':
           description: Perfil creado exitosamente
