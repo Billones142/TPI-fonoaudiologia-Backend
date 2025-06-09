@@ -59,7 +59,7 @@ export const selectProfileController: RequestHandler = async (
 
       res.cookie("profilesession", profileSessionToken, {
         secure: false, // puedes parametrizar esto si usas HTTPS en prod
-        httpOnly: true,
+        httpOnly: false,
         expires,
       });
 
