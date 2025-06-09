@@ -208,7 +208,7 @@ export async function procesarRespuestaEnBaseDeDatos(selectionId: string): Promi
     throw new Error('Este juego ya supero el maximo tiempo para responder');
   }
 
-  await prisma.juego.update({
+  const juegoActualizado = await prisma.juego.update({
     where: {
       id: juego.id,
     },
@@ -216,9 +216,10 @@ export async function procesarRespuestaEnBaseDeDatos(selectionId: string): Promi
       objetoSeleccionadoId: objectSelectionIdPayload.objectId,
     },
   });
+  console.log('juego respondido:', juegoActualizado);
 
   if (objectSelectionIdPayload.isGameResult) {
-    await prisma.sesionJuego.update({
+    const sesionActualizada = await prisma.sesionJuego.update({
       where: {
         id: objectSelectionIdPayload.sessionId,
       },
@@ -228,8 +229,9 @@ export async function procesarRespuestaEnBaseDeDatos(selectionId: string): Promi
         },
       },
     });
+    console.log('sesion actualizada', sesionActualizada);
   } else {
-    await prisma.sesionJuego.update({
+    const sesionActualizado = await prisma.sesionJuego.update({
       where: {
         id: objectSelectionIdPayload.sessionId,
       },
@@ -239,6 +241,7 @@ export async function procesarRespuestaEnBaseDeDatos(selectionId: string): Promi
         },
       },
     });
+    console.log('sesion actualizada', sesionActualizado);
   }
 
   return objectSelectionIdPayload;
