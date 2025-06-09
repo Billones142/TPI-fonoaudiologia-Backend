@@ -21,7 +21,7 @@ export const userLoggedCheckMiddleware: Handler = async (
   next: NextFunction
 ): Promise<void> => {
   const { authorization } = req.headers;
-  const { profile_token } = req.cookies;
+  const { profilesession } = req.cookies;
 
   if (!authorization || !authorization.startsWith("Bearer ")) {
     res.status(403).json({
@@ -33,9 +33,9 @@ export const userLoggedCheckMiddleware: Handler = async (
   const token = authorization.split(" ")[1];
 
   try {
-    if (typeof profile_token === "string") {
+    if (typeof profilesession === "string") {
       try {
-        const data = jwt.verify(profile_token, secretKey) as Profile;
+        const data = jwt.verify(profilesession, secretKey) as Profile;
         req.profile = data;
       } catch (error) {
         throw new Error("Profile token was invalid");
@@ -67,7 +67,7 @@ export const userLoggedCheckMiddleware: Handler = async (
     next();
   } catch (error) {
     res.status(403).json({
-      message: "Invalid or expired token",
+      message: "Invalid or expired token: " + (error as Error).message,
     });
   }
 };

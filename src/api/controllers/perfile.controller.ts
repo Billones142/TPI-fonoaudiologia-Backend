@@ -63,6 +63,16 @@ export const selectProfileController: RequestHandler = async (
         expires,
       });
 
+      console.log('Cookie set:', {
+        name: 'profilesession',
+        value: profileSessionToken,
+        options: {
+          secure: false,
+          httpOnly: false,
+          expires
+        }
+      });
+
       res.json({
         message: "Profile selected successfully",
       });
