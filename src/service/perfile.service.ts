@@ -1,53 +1,120 @@
 import { prisma } from "../config/prismaSingleton";
 import { Perfil, Prisma } from "@prisma/client";
+import { secretKey } from "../config/env";
+import jwt from "jsonwebtoken";
+import { Profile } from "../types/models/User";
 
-// Crear perfil
-export const crearPerfil = async (
-  usuarioId: string,
-  data: Omit<Prisma.PerfilCreateInput, "usuario"> // Excluir la relación usuario
-): Promise<Perfil> => {
-  return await prisma.perfil.create({
-    data: {
-      ...data,
-      usuario: { connect: { id: usuarioId } },
+const cookiesExpireMinutes = 60 * 60;
+
+export const obtenerPerfilesPorUsuario = async (
+  authUserId: string
+): Promise<Perfil[]> => {
+  return await prisma.perfil.findMany({
+    where: {
+      usuario: {
+        authUserId,
+      },
     },
   });
 };
 
-export const editarPerfil = async (
-  id: string,
-  usuarioId: string,
-  data: Prisma.PerfilUpdateInput
-): Promise<Perfil> => {
-  const perfil = await prisma.perfil.findUnique({
-    where: { id },
+export const seleccionarPerfil = async (
+  authUserId: string,
+  profileId: string
+): Promise<string | null> => {
+  const profileData = await prisma.perfil.findFirst({
+    where: {
+      id: profileId,
+      usuario: {
+        authUserId,
+      },
+    },
   });
 
-  if (!perfil || perfil.usuarioId !== usuarioId) {
-    throw new Error("No autorizado o perfil no encontrado");
+  if (!profileData) {
+    return null;
   }
 
-  // Actualizar el perfil
+  const payload: Profile = {
+    id: profileData.id,
+    name: profileData.nombre,
+  };
+
+  const profileSessionToken = jwt.sign(payload, secretKey, {
+    expiresIn: cookiesExpireMinutes, // 1 hour in seconds
+  });
+
+  return profileSessionToken;
+};
+
+// Crear perfil
+export const crearPerfil = async (
+  authUserId: string,
+  nombre: string,
+  avatar_url: string
+): Promise<Perfil> => {
+  const usuarioId = await prisma.usuario.findUnique({
+    where: { authUserId },
+    select: { id: true },
+  });
+  return await prisma.perfil.create({
+    data: {
+      nombre: nombre,
+      avatarUrl: avatar_url,
+      usuarioId: usuarioId?.id || "",
+    },
+  });
+};
+
+//if (!perfil || perfil.usuarioId !== usuarioId) {
+//throw new Error("No autorizado o perfil no encontrado");
+//}
+export const editarPerfil = async (
+  perfilId: string,
+  authUserId: string,
+  nombre: string,
+  avatar_url: string
+): Promise<Perfil> => {
+  const usuarioId = await prisma.usuario.findUnique({
+    where: { authUserId },
+    select: { id: true },
+  });
+  if (!usuarioId) {
+    throw new Error("Usuario no encontrado");
+  }
+
+  const perfil = await prisma.perfil.findUnique({
+    where: { id: perfilId }, // Asumo que tu campo en la tabla es `id`, no `perfilId`. Si tu campo es `perfilId`, entonces mantenelo.
+    select: { id: true, usuarioId: true },
+  });
+
+  if (!perfil || perfil.usuarioId !== usuarioId.id) {
+    throw new Error("No autorizado o perfil no encontrado");
+  }
   return await prisma.perfil.update({
-    where: { id },
-    data,
+    where: {
+      id: perfilId, // suponiendo que perfilId sea el id del perfil que querés editar
+    },
+    data: {
+      nombre: nombre,
+      avatarUrl: avatar_url,
+    },
   });
 };
 
 // Eliminar perfil
 export const eliminarPerfil = async (
-  id: string,
-  usuarioId: string
+  perfilId: string,
+  authUserId: string
 ): Promise<void> => {
-  const perfil = await prisma.perfil.findUnique({
-    where: { id },
+  const usuarioId = await prisma.usuario.findUnique({
+    where: { authUserId },
+    select: { id: true },
   });
-
-  if (!perfil || perfil.usuarioId !== usuarioId) {
-    throw new Error("No autorizado o perfil no encontrado");
+  if (!usuarioId) {
+    throw new Error("Usuario no encontrado");
   }
-
   await prisma.perfil.delete({
-    where: { id },
+    where: { id: perfilId },
   });
 };
