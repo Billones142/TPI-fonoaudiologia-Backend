@@ -464,10 +464,11 @@ paths:
               properties:
                 name:
                   type: string
-                avatar_url:
+                avatarUrl:
                   type: string
               required:
                 - name
+                - avatarUrl
       responses:
         '200':
           description: Perfil editado exitosamente
