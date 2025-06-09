@@ -3,8 +3,6 @@ import { getProgressedScenesController, getSceneProgressController } from '../co
 
 const router = Router();
 
-router.use();
-
 router.get('/getProgressedScenes', getProgressedScenesController);
 router.get('/:sceneId', getSceneProgressController);
 
