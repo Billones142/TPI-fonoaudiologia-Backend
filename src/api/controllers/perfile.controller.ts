@@ -57,10 +57,11 @@ export const selectProfileController: RequestHandler = async (
     if (profileSessionToken) {
       const expires = new Date(Date.now() + cookiesExpireMinutes * 1000);
 
+      const isDevelopment = process.env.NODE_ENV !== 'production';
       res.cookie("profilesession", profileSessionToken, {
-        secure: Boolean(process.env.SECURE_COOKIES),
+        secure: isDevelopment ? false : Boolean(process.env.SECURE_COOKIES),
         httpOnly: false,
-        sameSite: Boolean(process.env.SECURE_COOKIES) ? 'none' : 'lax',
+        sameSite: isDevelopment ? 'lax' : (Boolean(process.env.SECURE_COOKIES) ? 'none' : 'lax'),
         expires,
       });
 
