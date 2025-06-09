@@ -61,7 +61,7 @@ async function main(): Promise<void> {
     if (profileResponse.token) {
       updateProfileSessionHeader(profileResponse.token);
     }
-    console.log('Token de perfil actualizado');
+    console.log('Token de perfil actualizado', profileResponse);
 
     const escenarios = await ScenesService.getScenes();
     const escenarioId = escenarios[0].id;

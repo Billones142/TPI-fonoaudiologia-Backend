@@ -75,6 +75,7 @@ export const selectProfileController: RequestHandler = async (req: Request, res:
     res.cookie('profilesession', profileSessionToken, { secure: false, httpOnly: true, expires: expires });
     res.json({
       message: 'Profile selected succesfully',
+      token: profileSessionToken
     });
   } else {
     res.status(404).json({
