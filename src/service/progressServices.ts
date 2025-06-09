@@ -3,9 +3,10 @@ import { GameSession, ProgresedScene } from '../types/models/Progress';
 
 
 export async function getScenesWithProfileProgress(profileId: string): Promise<ArrayLike<ProgresedScene>> {
+  console.log('Buscando escenarios perfil:', profileId);
   const escenarios = await prisma.escenario.findMany({
     where: {
-      progresosEscenarios: {
+      sesiones: {
         some: {
           perfilId: profileId,
         },
@@ -13,6 +14,7 @@ export async function getScenesWithProfileProgress(profileId: string): Promise<A
     },
   });
 
+  console.log('Escenarios con progreso de perfil:', escenarios);
   return escenarios.map<ProgresedScene>((escenario) => {
     return {
       id: escenario.id,
