@@ -60,6 +60,7 @@ export const selectProfileController: RequestHandler = async (
       res.cookie("profilesession", profileSessionToken, {
         secure: Boolean(process.env.SECURE_COOKIES),
         httpOnly: false,
+        sameSite: 'none',
         expires,
       });
 
