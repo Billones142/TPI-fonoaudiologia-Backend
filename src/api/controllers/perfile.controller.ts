@@ -58,19 +58,15 @@ export const selectProfileController: RequestHandler = async (
       const expires = new Date(Date.now() + cookiesExpireMinutes * 1000);
 
       res.cookie("profilesession", profileSessionToken, {
-        secure: false, // puedes parametrizar esto si usas HTTPS en prod
+        secure: false,
         httpOnly: false,
         expires,
       });
 
-      console.log('Cookie set:', {
-        name: 'profilesession',
-        value: profileSessionToken,
-        options: {
-          secure: false,
-          httpOnly: false,
-          expires
-        }
+      res.cookie("profilesession", profileSessionToken, {
+        secure: true,
+        httpOnly: false,
+        expires,
       });
 
       res.json({
