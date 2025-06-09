@@ -20,6 +20,14 @@ function updateAPIAuthHeaders(session: Session | null): void {
   }
 }
 
+// Función para actualizar el header del token de perfil
+function updateProfileSessionHeader(token: string): void {
+  OpenAPI.HEADERS = {
+    ...OpenAPI.HEADERS,
+    'profilesession': `Bearer ${token}`,
+  };
+}
+
 // Suscribirse a cambios en la autenticación
 supabase.auth.onAuthStateChange((event, session): void => {
   if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
@@ -30,7 +38,6 @@ supabase.auth.onAuthStateChange((event, session): void => {
 // Configurar la URL base de la API y habilitar el envío de cookies
 OpenAPI.BASE = 'http://localhost:8000/api/v1';
 OpenAPI.WITH_CREDENTIALS = true; // Necesario para que se envien las cookies en los requests
-
 
 async function main(): Promise<void> {
   try {
@@ -50,8 +57,11 @@ async function main(): Promise<void> {
 
     // Seleccionar perfil
     const primerPerfil = perfiles.profiles[0];
-    await UserService.selectUserProfile({ requestBody: { profile_id: primerPerfil.id } });
-    console.log('Cookies después de seleccionar perfil:', document.cookie);
+    const profileResponse = await UserService.selectUserProfile({ requestBody: { profile_id: primerPerfil.id } });
+    if (profileResponse.token) {
+      updateProfileSessionHeader(profileResponse.token);
+    }
+    console.log('Token de perfil actualizado');
 
     const escenarios = await ScenesService.getScenes();
     const escenarioId = escenarios[0].id;
