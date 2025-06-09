@@ -462,12 +462,12 @@ paths:
             schema:
               type: object
               properties:
-                name:
+                nombre:
                   type: string
                 avatarUrl:
                   type: string
               required:
-                - name
+                - nombre
                 - avatarUrl
       responses:
         '200':
@@ -542,12 +542,12 @@ paths:
             schema:
               type: object
               properties:
-                name:
+                nombre:
                   type: string
                 avatarUrl:
                   type: string
               required:
-                - name
+                - nombre
                 - avatarUrl
       responses:
         '201':
