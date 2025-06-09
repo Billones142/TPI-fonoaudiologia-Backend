@@ -21,6 +21,9 @@ export const userLoggedCheckMiddleware: Handler = async (
   next: NextFunction
 ): Promise<void> => {
   const { authorization } = req.headers;
+  try {
+    console.log('cookies de usuario:', JSON.stringify(req.cookies));
+  } catch (error) { }
   const { profilesession } = req.cookies;
 
   if (!authorization || !authorization.startsWith("Bearer ")) {
