@@ -114,6 +114,16 @@ export const eliminarPerfil = async (
   if (!usuarioId) {
     throw new Error("Usuario no encontrado");
   }
+
+  const perfil = await prisma.perfil.findUnique({
+    where: { id: perfilId },
+    select: { id: true, usuarioId: true },
+  });
+
+  if (!perfil || perfil.usuarioId !== usuarioId.id) {
+    throw new Error("No autorizado o perfil no encontrado");
+  }
+
   await prisma.perfil.delete({
     where: { id: perfilId },
   });
