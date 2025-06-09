@@ -16,10 +16,11 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-    profileCookie:
-      type: apiKey
-      in: cookie
-      name: profilesession
+    profilesession:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Token de sesión del perfil de usuario
 
   schemas:
     Error:
@@ -112,6 +113,9 @@ components:
       properties:
         message:
           type: string
+        token:
+          type: string
+          description: Token de sesión del perfil de usuario
 
     Profile:
       type: object
@@ -420,11 +424,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SelectProfileResponse'
-          headers:
-            Set-Cookie:
-              schema:
-                type: string
-                example: profilesession=xyz789; HttpOnly
         '404':
           description: Perfil no encontrado
           content:

@@ -67,6 +67,7 @@ export const selectProfileController: RequestHandler = async (
 
       res.json({
         message: "Profile selected successfully",
+        token: profileSessionToken,
       });
     } else {
       res.status(404).json({

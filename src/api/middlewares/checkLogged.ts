@@ -20,11 +20,10 @@ export const userLoggedCheckMiddleware: Handler = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const { authorization } = req.headers;
+  const { authorization, profilesession } = req.headers;
   try {
     console.log('cookies de usuario:', JSON.stringify(req.cookies));
   } catch (error) { }
-  const { profilesession } = req.cookies;
 
   if (!authorization || !authorization.startsWith("Bearer ")) {
     res.status(403).json({
@@ -38,7 +37,7 @@ export const userLoggedCheckMiddleware: Handler = async (
   try {
     if (typeof profilesession === "string") {
       try {
-        const data = jwt.verify(profilesession, secretKey) as Profile;
+        const data = jwt.verify(profilesession.split(' ')[1], secretKey) as Profile;
         req.profile = data;
       } catch (error) {
         throw new Error("Profile token was invalid");
